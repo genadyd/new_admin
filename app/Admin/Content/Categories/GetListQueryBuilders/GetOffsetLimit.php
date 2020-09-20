@@ -32,7 +32,8 @@ class GetOffsetLimit implements GetListQueryBuilderInterface
        $array['categories'] = \DB::table('categories')
             ->where('deleted_at',null)
             ->limit($this->action['per_page'])
-            ->offset($offset)->get();
+            ->offset($offset)
+            ->get();
        $array['paginations'] = $pagination;
        return $array;
 
