@@ -1,0 +1,10 @@
+@import "../../vars";
+
+#content_container {
+    #form_open_close, #list_open_close{
+        //display: none;
+    }
+    @import "form";
+    @import "list";
+    @import "switcher";
+}

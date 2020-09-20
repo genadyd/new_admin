@@ -1,0 +1,22 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Project exclude paths
+/resources/js/admin/api/Api.js
+/resources/js/admin/api/CategoriesApi.js
+/resources/js/admin/api/MenuApi.js
+/resources/js/admin/lib/FormFieldsValidator.js
+/resources/js/admin/modules/categories_module/list/ListListeners.js
+/resources/js/admin/modules/categories_module/list/ListPagination.js
+/resources/js/admin/modules/categories_module/Categories.js
+/resources/js/admin/modules/categories_module/index.js

@@ -1,0 +1,25 @@
+@import "vars";
+body {
+    font-family: Lato, sans-serif;
+    .material-icons{
+        line-height: inherit;
+        color: #636b6f;
+    }
+    #page-wrapper {
+        @import "layouts/header";
+        #page_container{
+            min-height: calc(100vh - 100px);
+            @import "layouts/side_panel";
+            @import "layouts/content_container";
+        }
+    }
+}
+@media (max-width: 992px) {
+    body {
+        #page-wrapper {
+            #page_container {
+                min-height: calc( 100vh - 64px );
+            }
+        }
+    }
+}

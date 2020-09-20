@@ -1,0 +1,22 @@
+#form_open_close:checked ~ #category_form_container{
+    display: block;
+}
+#form_open_close:checked ~ #content_switcher [for=form_open_close]{
+    color: #636b6f;
+}
+#list_open_close:checked ~ #categories_list_container{
+    display: block;
+}
+#list_open_close:checked ~ #content_switcher [for=list_open_close]{
+    color: #636b6f;
+}
+#content_switcher{
+    .switch{
+        color: $orange-color;
+        cursor: pointer;
+        &:hover{
+            opacity: .6;
+        }
+    }
+
+}

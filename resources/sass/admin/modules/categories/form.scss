@@ -1,0 +1,65 @@
+#category_form_container{
+    display: none;
+    .category_data{
+        .input_block {
+            .error_alert{
+                display: none;
+                height:auto;
+                width: auto;
+                box-shadow: 0 3px 8px 0px #00000096;
+                background-color: #fff;
+                position: absolute;
+                z-index: 2;
+                right: 0;
+                transform: translateY(3px);
+                color: $orange-color;
+                text-align: center;
+                padding: 1em 2em;
+
+                visibility: hidden;
+            }
+            &.error{
+                >.form-control{
+                    border-color: $orange-color;
+                }
+                .error_alert{
+                    display: block;
+                    visibility:visible;
+                }
+            }
+        }
+    }
+    .catTextFieldsContainer{
+        .remove_field, .text_open_close {
+            display: none;
+            cursor: pointer;
+            &:hover{
+                color:$orange-color;
+            }
+        }
+        .added{
+            overflow: hidden;
+            transition: max-height .5s ease-in;
+            max-height: 1000px;
+            .remove_field , .text_open_close{
+                display: block;
+            }
+            .body{
+                max-height: 700px;
+                transition: max-height 0.25s;
+                overflow: hidden;
+                &.colapsed{
+                    max-height: 0;
+                }
+            }
+            &.hidden{
+                max-height: 0;
+            }
+
+        }
+    }
+    #category_form_submit{
+        background-color: $orange-color;
+        color: #fff;
+    }
+}
