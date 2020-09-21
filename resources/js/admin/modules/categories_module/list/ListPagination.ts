@@ -1,22 +1,28 @@
 import CategoriesApi from "../../../api/CategoriesApi";
+import ListStor from "./ListStor";
 
 class ListPagination {
     private tableContainer = document.getElementById('categories_list_container')
+    private stor = new ListStor()
     page = (button:any) => {
-
-        if (!button) return
-        const pageNum = button.getAttribute('page_num')
+        if (button) {
+            const pageNum = button.getAttribute('page_num')
+            this.stor.setState('current_page',pageNum)
+            this.getListFromApi()
+        }
+    }
+    private getListFromApi=()=>{
         const token = document.querySelector('[name=csrf-token]')
         const formData = {
             action: {
                 type: 'get_offset_limit',
-                current_page: pageNum
+                current_page: this.stor.getState('current_page')
             },
             'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
         }
         const Api = new CategoriesApi('/admin/categories/get_list', 'POST', {formData: JSON.stringify(formData)})
-        const promice: any = Api.exeq()
-        promice.then((data: any) => {
+        const promise: any = Api.exeq()
+        promise.then((data: any) => {
             this.appendList(this.tableBuilder(data))
             this.appendPagination(this.paginationBuilder(data))
         })
@@ -24,14 +30,18 @@ class ListPagination {
     private tableBuilder = (data: any): string => {
         let htmlTable = ''
         data.categories.forEach((item: any) => {
-            htmlTable += '<tr>' +
-                '<td scope="row">' + item.id + '</td>' +
-                '<td>' + item.name + '</td>' +
-                '<td>' + item.description + '</td>' +
-                '<td class="cat_contrrols">controls</td>' +
-                '</tr>'
+            htmlTable += this.getOneCategoryHtml(item)
         })
         return htmlTable
+    }
+
+    private getOneCategoryHtml = (item:any)=>{
+        return '<tr>' +
+            '<td scope="row">' + item.id + '</td>' +
+            '<td>' + item.name + '</td>' +
+            '<td>' + item.description + '</td>' +
+            '<td class="cat_controls">controls</td>' +
+            '</tr>'
     }
     private paginationBuilder = (data: any): string => {
         let start_page = +data.start_button_num,
