@@ -16,7 +16,9 @@ class ListPagination {
         const formData = {
             action: {
                 type: 'get_offset_limit',
-                current_page: this.stor.getState('current_page')
+                current_page: this.stor.getState('current_page'),
+                sort_by_date:this.stor.getState('sort_by_date_desc')
+
             },
             'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
         }
@@ -65,7 +67,8 @@ class ListPagination {
             '</li>'
         //===============================
         for (let i = start_page; i <= buttons_num; i++) {
-            navHtml += '<li class="page-item">' +
+            let current = current_page==i?'current':''
+            navHtml += '<li class="page-item '+current+'">' +
                 '<a class="page-link" page_num="' + i + '" href="#">' + i + '</a></li>'
         }
         //========================================
@@ -90,6 +93,21 @@ class ListPagination {
             if(!navElement)return
             navElement.innerHTML = navHtml
         }
+    }
+    public sortByDate=()=>{
+        this.stor.setState('sort_by_date_desc',!this.stor.getState('sort_by_date_desc'))
+        const currentPageButton = document.querySelector('ul.pagination li.current a')
+        let currentPage =1
+        if(currentPageButton){
+            let pageNum = currentPageButton.getAttribute('page_num')
+            if(pageNum) {
+                currentPage = parseInt(pageNum)
+            }
+            this.stor.setState('current_page',currentPage)
+            this.getListFromApi()
+        }
+
+
     }
 }
 

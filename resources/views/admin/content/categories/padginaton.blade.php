@@ -7,7 +7,7 @@
             </a>
         </li>
         @for($i = $list['start_button_num']; $i<($list['start_button_num']+$list['pages_num']);$i++)
-        <li class="page-item"><a class="page-link" page_num="{{$i}}" href="#">{{$i}}</a></li>
+        <li class="page-item @if($i===1) current @endif"><a class="page-link" page_num="{{$i}}" href="#">{{$i}}</a></li>
         @endfor
         <li class="page-item">
             <a class="page-link"  page_num="{{$list['last_page']}}" href="#" aria-label="Next">

@@ -72,6 +72,14 @@
   display: none;
 }
 
+#content_container #categories_list_container .pagination .current {
+  background: #bebebe;
+}
+
+#content_container #categories_list_container .pagination .current a {
+  color: #ED7117;
+}
+
 #content_container #form_open_close:checked ~ #category_form_container {
   display: block;
 }

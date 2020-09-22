@@ -19,6 +19,7 @@ class ListController
     private $per_page = 6;/*---items per page---*/
     private $pages_num = 3; /*---number of pages displaed in pagination---*/
     private $current_page = 1; /* curent page number*/
+    private $sort_by_date = false;
     private $type = 'get_offset_limit';
     public function getList(){
 
@@ -26,6 +27,7 @@ class ListController
             'type'=> $this->type ,
             'current_page'=>$this->current_page,
             'per_page'=>$this->per_page,
+            'sort_by_date'=>$this->sort_by_date
         ];
 /*
  * factory must retreeve object off GetListQueryBuilderInterface
@@ -67,6 +69,7 @@ class ListController
     public function getListJson(Request $request){
         $form_data = json_decode($request->input('formData'),true);
         $action = $form_data['action'];
+        $this->sort_by_date = $action['sort_by_date'];
         $this->type = $action['type'];
         $this->current_page = $action['current_page'];
         return json_encode($this->getList());

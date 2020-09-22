@@ -7,8 +7,8 @@ class ListStor{
        deleted:false,
        sort_by_date_desc:false,
    }
-   public getState=(stateField:string)=>this.listState[stateField]
-   public setState=(stateField:string, stateValue:number|boolean)=>{
+   public getState=(stateField:string):number|boolean=>this.listState[stateField]
+   public setState=(stateField:string, stateValue:number|boolean):void=>{
        this.listState[stateField] = stateValue
    }
 }

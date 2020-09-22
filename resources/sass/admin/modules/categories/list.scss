@@ -1,3 +1,11 @@
 #categories_list_container{
     display: none;
+    .pagination{
+        .current{
+            background: #bebebe;
+            a{
+                color: $orange-color;
+            }
+        }
+    }
 }
