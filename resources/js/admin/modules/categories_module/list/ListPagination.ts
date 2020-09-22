@@ -3,7 +3,9 @@ import ListStor from "./ListStor";
 
 class ListPagination {
     private tableContainer = document.getElementById('categories_list_container')
+    private actionType = 'get_offset_limit'
     private stor = new ListStor()
+
     page = (button:any) => {
         if (button) {
             const pageNum = button.getAttribute('page_num')
@@ -15,9 +17,10 @@ class ListPagination {
         const token = document.querySelector('[name=csrf-token]')
         const formData = {
             action: {
-                type: 'get_offset_limit',
+                type: this.actionType,
                 current_page: this.stor.getState('current_page'),
-                sort_by_date:this.stor.getState('sort_by_date_desc')
+                sort_by_date:this.stor.getState('sort_by_date_desc'),
+                deleted:this.stor.getState('deleted')
 
             },
             'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
@@ -106,8 +109,24 @@ class ListPagination {
             this.stor.setState('current_page',currentPage)
             this.getListFromApi()
         }
+    }
+    public includeDeleted():void{
+        this.stor.setState('deleted',!this.stor.getState('deleted'))
+        const currentPageButton = document.querySelector('ul.pagination li.current a')
+        let currentPage =1
+        if(currentPageButton){
+            let pageNum = currentPageButton.getAttribute('page_num')
+            if(pageNum) {
+                currentPage = parseInt(pageNum)
+            }
+            this.stor.setState('current_page',currentPage)
+            this.getListFromApi()
+        }
+    }
+    public justDeleted(isChecked:boolean):void{
 
-
+        this.actionType = isChecked?'just_deleted':'get_offset_limit'
+        this.getListFromApi()
     }
 }
 

@@ -773,6 +773,9 @@ function () {
 
     this.listContainer = document.getElementById('categories_list_container');
     this.pagination = new ListPagination_1["default"]();
+    /*
+    * pagination exequte
+    * */
 
     this.pageSwitch = function () {
       if (_this.listContainer) {
@@ -793,6 +796,10 @@ function () {
         });
       }
     };
+    /*
+    * sorting by date
+    * */
+
 
     this.sortByDate = function () {
       if (_this.listContainer) {
@@ -805,9 +812,44 @@ function () {
         }
       }
     };
+    /*
+    * show hide deleted items
+    * */
+
+
+    this.includeDeleted = function () {
+      if (_this.listContainer) {
+        var sortByDateInput = _this.listContainer.querySelector('#categories_control_panel #include_deleted');
+
+        if (sortByDateInput) {
+          sortByDateInput.addEventListener('click', function (e) {
+            _this.pagination.includeDeleted();
+          });
+        }
+      }
+    };
+
+    this.justDeleted = function () {
+      if (_this.listContainer) {
+        var sortByDateInput = _this.listContainer.querySelector('#categories_control_panel #just_deleted');
+
+        if (sortByDateInput) {
+          sortByDateInput.addEventListener('click', function (e) {
+            // this.pagination.justDeleted()
+            var checkBox = e.target;
+
+            if (checkBox) {
+              _this.pagination.justDeleted(checkBox.checked);
+            }
+          });
+        }
+      }
+    };
 
     this.pageSwitch();
     this.sortByDate();
+    this.includeDeleted();
+    this.justDeleted();
   }
 
   return ListListeners;
@@ -848,6 +890,7 @@ function () {
     var _this = this;
 
     this.tableContainer = document.getElementById('categories_list_container');
+    this.actionType = 'get_offset_limit';
     this.stor = new ListStor_1["default"]();
 
     this.page = function (button) {
@@ -864,9 +907,10 @@ function () {
       var token = document.querySelector('[name=csrf-token]');
       var formData = {
         action: {
-          type: 'get_offset_limit',
+          type: _this.actionType,
           current_page: _this.stor.getState('current_page'),
-          sort_by_date: _this.stor.getState('sort_by_date_desc')
+          sort_by_date: _this.stor.getState('sort_by_date_desc'),
+          deleted: _this.stor.getState('deleted')
         },
         'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
       };
@@ -960,6 +1004,28 @@ function () {
     };
   }
 
+  ListPagination.prototype.includeDeleted = function () {
+    this.stor.setState('deleted', !this.stor.getState('deleted'));
+    var currentPageButton = document.querySelector('ul.pagination li.current a');
+    var currentPage = 1;
+
+    if (currentPageButton) {
+      var pageNum = currentPageButton.getAttribute('page_num');
+
+      if (pageNum) {
+        currentPage = parseInt(pageNum);
+      }
+
+      this.stor.setState('current_page', currentPage);
+      this.getListFromApi();
+    }
+  };
+
+  ListPagination.prototype.justDeleted = function (isChecked) {
+    this.actionType = isChecked ? 'just_deleted' : 'get_offset_limit';
+    this.getListFromApi();
+  };
+
   return ListPagination;
 }();
 
@@ -988,6 +1054,7 @@ function () {
     var _this = this;
 
     this.listState = {
+      categories: [],
       current_page: 1,
       per_page: 6,
       not_deleted: true,

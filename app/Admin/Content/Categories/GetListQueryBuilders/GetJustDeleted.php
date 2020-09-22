@@ -10,13 +10,14 @@
 namespace App\Admin\Content\Categories\GetListQueryBuilders;
 
 
-use App\Admin\Content\Categories\Paginations\GetOffsetLimitPaginationTrait;
+use App\Admin\Content\Categories\Paginations\GetJustDeletedPaginationTrait;
+
 use Illuminate\Support\Facades\DB;
 
-class GetOffsetLimit implements GetListQueryBuilderInterface
+class GetJustDeleted implements GetListQueryBuilderInterface
 {
     private $action;
-    use GetOffsetLimitPaginationTrait;
+    use GetJustDeletedPaginationTrait;
 
     public function __construct(array $action = array())
     {
@@ -25,13 +26,13 @@ class GetOffsetLimit implements GetListQueryBuilderInterface
 
     public function list()
     {
+//       dd($this->action);
         $pagination = $this->getPagination();
 
         $offset = ($this->action['current_page'] - 1) * $this->action['per_page'];
         $st = DB::table('categories');
-        if(!$this->action['deleted']) {
-            $st->where('deleted_at', null);
-        }
+            $st->where('deleted_at','!=', null);
+
             $st->limit($this->action['per_page'])
             ->offset($offset);
             if(isset($this->action['sort_by_date']) && $this->action['sort_by_date']){

@@ -21,13 +21,14 @@ class ListController
     private $current_page = 1; /* curent page number*/
     private $sort_by_date = false;
     private $type = 'get_offset_limit';
+    private $deleted = false;
     public function getList(){
-
         $action = [
             'type'=> $this->type ,
             'current_page'=>$this->current_page,
             'per_page'=>$this->per_page,
-            'sort_by_date'=>$this->sort_by_date
+            'sort_by_date'=>$this->sort_by_date,
+            'deleted'=>$this->deleted
         ];
 /*
  * factory must retreeve object off GetListQueryBuilderInterface
@@ -37,6 +38,7 @@ class ListController
  * and object for building pagination buttons
  *
  * */
+
         $list_factory = new GetListFactory($action);
         $q_class = $list_factory->getClass();
         $list_data = $q_class->list(); /* categories and pagination data  */
@@ -72,6 +74,7 @@ class ListController
         $this->sort_by_date = $action['sort_by_date'];
         $this->type = $action['type'];
         $this->current_page = $action['current_page'];
+        $this->deleted = $action['deleted'];
         return json_encode($this->getList());
     }
     private function setPagesNum($paginations, &$pages_num){

@@ -2,19 +2,19 @@
 /**
  * Created by PhpStorm.
  * User: Genady
- * Date: 9/17/20
- * Time: 1:47 AM
+ * Date: 9/22/20
+ * Time: 12:21 PM
  */
 namespace App\Admin\Content\Categories\Paginations;
 
 
-trait GetOffsetLimitPaginationTrait {
+trait GetJustDeletedPaginationTrait {
     public function getPagination(){
         $paginator = [];
         $all_count = \DB::table('categories');
-        if(!$this->action['deleted']) {
-            $all_count =   $all_count->where('deleted_at', null);
-        }
+
+            $all_count =   $all_count->where('deleted_at','!=' ,null);
+
         $all_count = $all_count->count();
         $all_pages_num = (int)ceil($all_count/$this->action['per_page']);
         $curent_page = $this->action['current_page'];

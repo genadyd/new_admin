@@ -29,6 +29,7 @@ namespace App\Admin\Content\Categories;
 
 
 use App\Admin\Content\Categories\GetListQueryBuilders\GetOffsetLimit;
+use App\Admin\Content\Categories\GetListQueryBuilders\GetJustDeleted;
 
 class GetListFactory
 {
@@ -45,6 +46,9 @@ class GetListFactory
         switch ($type){
             case 'get_offset_limit':
                 $this->query_class = new GetOffsetLimit($this->action);
+                break;
+            case 'just_deleted':
+                $this->query_class = new GetJustDeleted($this->action);
                 break;
             default:
                 $this->query_class = new GetOffsetLimit($this->action);
