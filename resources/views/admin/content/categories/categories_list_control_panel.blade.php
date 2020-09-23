@@ -7,7 +7,7 @@
     <div class="custom-control custom-checkbox col-3">
         <input type="checkbox" class="custom-control-input" id="just_deleted">
         <label class="custom-control-label" for="just_deleted">
-            <small>Just Deleted</small></label>
+            <small>Only Deleted</small></label>
     </div>
     <div class="custom-control custom-checkbox col-3">
         <input type="checkbox" class="custom-control-input" id="sort_by_date">

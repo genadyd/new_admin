@@ -1,14 +1,14 @@
-import ListPagination from "./ListPagination";
+import ListController from "./ListController";
 
 class ListListeners {
     private listContainer = document.getElementById('categories_list_container')
-    private pagination = new ListPagination()
+    private listController = new ListController()
 
     constructor() {
         this.pageSwitch()
         this.sortByDate()
         this.includeDeleted()
-        this.justDeleted()
+        this.onlyDeleted()
     }
 /*
 * pagination exequte
@@ -23,7 +23,14 @@ class ListListeners {
                             targ = targ.closest('a.page-link')
                         }
                         e.preventDefault()
-                        this.pagination.page(targ)
+                        try {
+                            let pageNum = targ.getAttribute('page_num')
+
+                            this.listController.regularPage(pageNum)
+                        }catch (error){
+                             console.error('Expected attrribute "page_num" in target Button')
+                        }
+
                     }
                 }
 
@@ -37,8 +44,8 @@ class ListListeners {
         if (this.listContainer) {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #sort_by_date')
             if (sortByDateInput) {
-                sortByDateInput.addEventListener('click', (e) => {
-                    this.pagination.sortByDate()
+                sortByDateInput.addEventListener('click', () => {
+                    this.listController.sortByDate()
                 })
             }
 
@@ -51,14 +58,14 @@ class ListListeners {
         if (this.listContainer) {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #include_deleted')
             if (sortByDateInput) {
-                sortByDateInput.addEventListener('click', (e) => {
-                    this.pagination.includeDeleted()
+                sortByDateInput.addEventListener('click', () => {
+                    this.listController.includeDeleted()
                 })
             }
 
         }
     }
-    justDeleted = () => {
+    onlyDeleted = () => {
         if (this.listContainer) {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #just_deleted')
             if (sortByDateInput) {
@@ -66,7 +73,7 @@ class ListListeners {
                     // this.pagination.justDeleted()
                     const checkBox:any = e.target
                     if(checkBox) {
-                            this.pagination.justDeleted(checkBox.checked)
+                            this.listController.justDeleted(checkBox.checked)
                     }
                 })
             }
