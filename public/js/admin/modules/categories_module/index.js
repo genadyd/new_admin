@@ -121,7 +121,7 @@ function () {
     this.exeq = function () {
       var urlPrefix = '/new_admin/public/api';
 
-      if (window.location.host == 'www.admin.loc' || window.location.host == '127.0.0.1:8000') {
+      if (window.location.host == 'www.admin.loc' || window.location.host == '127.0.0.1:8000' || window.location.host == 'gena-admin.com') {
         urlPrefix = '/api';
       }
 
@@ -938,8 +938,7 @@ function () {
             // this.pagination.justDeleted()
             var checkBox = e.target;
 
-            if (checkBox) {
-              _this.listController.justDeleted(checkBox.checked);
+            if (checkBox) {// this.listController.justDeleted(checkBox.checked)
             }
           });
         }

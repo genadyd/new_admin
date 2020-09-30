@@ -73,7 +73,7 @@ class ListListeners {
                     // this.pagination.justDeleted()
                     const checkBox:any = e.target
                     if(checkBox) {
-                            this.listController.justDeleted(checkBox.checked)
+                            // this.listController.justDeleted(checkBox.checked)
                     }
                 })
             }

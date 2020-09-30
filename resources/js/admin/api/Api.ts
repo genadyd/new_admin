@@ -13,7 +13,7 @@ abstract class Api {
    public exeq=():object=>{
 
        let urlPrefix = '/new_admin/public/api'
-       if(window.location.host == 'www.admin.loc' || window.location.host == '127.0.0.1:8000'){
+       if(window.location.host == 'www.admin.loc' || window.location.host == '127.0.0.1:8000'|| window.location.host =='gena-admin.com'){
           urlPrefix = '/api'
        }
        const type = this.type==='json'?'application/json':'text/html'
