@@ -5,10 +5,14 @@ class ListListeners {
     private listController = new ListController()
 
     constructor() {
+        this.getList()
         this.pageSwitch()
         this.sortByDate()
         this.includeDeleted()
         this.onlyDeleted()
+    }
+    getList=()=>{
+       this.listController.getAllList()
     }
 /*
 * pagination exequte
@@ -70,10 +74,9 @@ class ListListeners {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #just_deleted')
             if (sortByDateInput) {
                 sortByDateInput.addEventListener('click', (e) => {
-                    // this.pagination.justDeleted()
                     const checkBox:any = e.target
                     if(checkBox) {
-                            // this.listController.justDeleted(checkBox.checked)
+                            this.listController.onlyDeleted()
                     }
                 })
             }

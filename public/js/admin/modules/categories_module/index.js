@@ -763,13 +763,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var ListStor_1 = __importDefault(__webpack_require__(/*! ./ListStor */ "./resources/js/admin/modules/categories_module/list/ListStor.js"));
+var ListStore_1 = __importDefault(__webpack_require__(/*! ./state/ListStore */ "./resources/js/admin/modules/categories_module/list/state/ListStore.js"));
 
-var RegularRender_1 = __importDefault(__webpack_require__(/*! ./list_render/RegularRender */ "./resources/js/admin/modules/categories_module/list/list_render/RegularRender.js"));
+var RegularRender_1 = __importDefault(__webpack_require__(/*! ./list_render/RegularRender */ "./resources/js/admin/modules/categories_module/list/list_render/RegularRender.js")); // import RegularListApi from "./list_api/RegularListApi";
 
-var RegularListApi_1 = __importDefault(__webpack_require__(/*! ./list_api/RegularListApi */ "./resources/js/admin/modules/categories_module/list/list_api/RegularListApi.js"));
 
 var RegularListBuilder_1 = __importDefault(__webpack_require__(/*! ./html_list_builder/RegularListBuilder */ "./resources/js/admin/modules/categories_module/list/html_list_builder/RegularListBuilder.js"));
+
+var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../../api/CategoriesApi */ "./resources/js/admin/api/CategoriesApi.js"));
 
 var ListController =
 /** @class */
@@ -777,57 +778,49 @@ function () {
   function ListController() {
     var _this = this;
 
-    this.stor = new ListStor_1["default"]();
+    this.store = new ListStore_1["default"]();
 
-    this.regularPage = function (pageNum) {
-      _this.stor.setState('current_page', pageNum);
+    this.getAllList = function () {
+      var token = document.querySelector('[name=csrf-token]');
+      var formData = {
+        action: {},
+        'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+      };
+      var Api = new CategoriesApi_1["default"]('/admin/categories/get_list', 'POST', {
+        formData: JSON.stringify(formData)
+      });
+      var promise = Api.exeq();
+      promise.then(function (data) {
+        _this.store.fillCategories(data, _this.regularPage, [1]);
+      });
+    };
 
-      var render = new RegularRender_1["default"](new RegularListApi_1["default"](_this.stor.getAllState()));
+    this.regularPage = function (curentPage) {
+      _this.store.setState('current_page', curentPage);
+
+      var render = new RegularRender_1["default"](_this.store);
       render.listRender(new RegularListBuilder_1["default"]());
     };
 
     this.sortByDate = function () {
-      _this.stor.setState('sort_by_date_desc', !_this.stor.getState('sort_by_date_desc'));
+      _this.store.setState('sort_by_date_desc', !_this.store.getState('sort_by_date_desc'));
 
-      var currentPageButton = document.querySelector('ul.pagination li.current a');
-      var currentPage = 1;
-
-      if (currentPageButton) {
-        var pageNum = currentPageButton.getAttribute('page_num');
-
-        if (pageNum) {
-          currentPage = parseInt(pageNum);
-        }
-
-        _this.stor.setState('current_page', currentPage);
-
-        var render = new RegularRender_1["default"](new RegularListApi_1["default"](_this.stor.getAllState()));
-        render.listRender(new RegularListBuilder_1["default"]());
-      }
-    }; // public justDeleted(isChecked:boolean):void{
-    //
-    //     // this.actionType = isChecked?'just_deleted':'get_offset_limit'
-    //     // this.getListFromApi()
-    // }
-
+      _this.regularPage(1);
+    };
   }
 
   ListController.prototype.includeDeleted = function () {
-    this.stor.setState('deleted', !this.stor.getState('deleted'));
-    var currentPageButton = document.querySelector('ul.pagination li.current a');
-    var currentPage = 1;
+    this.store.setState('include_deleted', !this.store.getState('include_deleted'), this.regularPage, [1]);
+  };
 
-    if (currentPageButton) {
-      var pageNum = currentPageButton.getAttribute('page_num');
+  ListController.prototype.onlyDeleted = function () {
+    var includeDeletedElement = document.getElementById('include_deleted');
 
-      if (pageNum) {
-        currentPage = parseInt(pageNum);
-      }
-
-      this.stor.setState('current_page', currentPage);
-      var render = new RegularRender_1["default"](new RegularListApi_1["default"](this.stor.getAllState()));
-      render.listRender(new RegularListBuilder_1["default"]());
+    if (includeDeletedElement && !includeDeletedElement.checked) {
+      includeDeletedElement.click();
     }
+
+    this.store.setState('only_deleted', !this.store.getState('only_deleted'), this.regularPage, [1]);
   };
 
   return ListController;
@@ -867,9 +860,14 @@ function () {
 
     this.listContainer = document.getElementById('categories_list_container');
     this.listController = new ListController_1["default"]();
+
+    this.getList = function () {
+      _this.listController.getAllList();
+    };
     /*
     * pagination exequte
     * */
+
 
     this.pageSwitch = function () {
       if (_this.listContainer) {
@@ -935,16 +933,17 @@ function () {
 
         if (sortByDateInput) {
           sortByDateInput.addEventListener('click', function (e) {
-            // this.pagination.justDeleted()
             var checkBox = e.target;
 
-            if (checkBox) {// this.listController.justDeleted(checkBox.checked)
+            if (checkBox) {
+              _this.listController.onlyDeleted();
             }
           });
         }
       }
     };
 
+    this.getList();
     this.pageSwitch();
     this.sortByDate();
     this.includeDeleted();
@@ -955,66 +954,6 @@ function () {
 }();
 
 exports["default"] = ListListeners;
-
-/***/ }),
-
-/***/ "./resources/js/admin/modules/categories_module/list/ListStor.js":
-/*!***********************************************************************!*\
-  !*** ./resources/js/admin/modules/categories_module/list/ListStor.js ***!
-  \***********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var ListStor =
-/** @class */
-function () {
-  function ListStor() {
-    var _this = this;
-
-    this.listState = {
-      current_page: 1,
-      per_page: 6,
-      not_deleted: true,
-      deleted: false,
-      sort_by_date_desc: false
-    };
-    /*
-    * get
-    * */
-
-    this.getState = function (stateField) {
-      return _this.listState[stateField];
-    };
-    /*
-    *
-    * set
-    * */
-
-
-    this.setState = function (stateField, stateValue) {
-      _this.listState[stateField] = stateValue;
-    };
-    /*
-    * get all
-    * */
-
-
-    this.getAllState = function () {
-      return _this.listState;
-    };
-  }
-
-  return ListStor;
-}();
-
-exports["default"] = ListStor;
 
 /***/ }),
 
@@ -1038,7 +977,7 @@ function () {
   function RegularListBuilder() {}
 
   RegularListBuilder.prototype.builder = function (item, key) {
-    return '<tr>' + '<td scope="row">' + item.id + '</td>' + '<td>' + item.name + '</td>' + '<td>' + item.description + '</td>' + '<td class="cat_controls">controls</td>' + '</tr>';
+    return '<tr>' + '<td scope="row">' + key + '</td>' + '<td>' + item.id + '</td>' + '<td>' + item.name + '</td>' + '<td>' + item.heading + '</td>' + '<td class="cat_controls">controls</td>' + '</tr>';
   };
 
   return RegularListBuilder;
@@ -1068,78 +1007,26 @@ function () {
   function RegularPaginationBuilder() {}
 
   RegularPaginationBuilder.prototype.build = function (data) {
-    var navHtml = '<ul class="pagination">' + '<li class="page-item">' + '<a class="page-link" page_num="1" href="#" aria-label="Previous">' + '<span aria-hidden="true">«</span>' + '</a>' + '</li>'; //===============================
+    if (data.buttons_num !== 0) {
+      var navHtml = '<ul class="pagination">' + '<li class="page-item">' + '<a class="page-link" page_num="1" href="#" aria-label="Previous">' + '<span aria-hidden="true">«</span>' + '</a>' + '</li>'; //===============================
 
-    for (var i = data.start_page; i <= data.buttons_num; i++) {
-      var current = data.current_page == i ? 'current' : '';
-      navHtml += '<li class="page-item ' + current + '">' + '<a class="page-link" page_num="' + i + '" href="#">' + i + '</a></li>';
-    } //========================================
+      for (var i = data.start_page; i <= data.buttons_num; i++) {
+        var current = data.current_page == i ? 'current' : '';
+        navHtml += '<li class="page-item ' + current + '">' + '<a class="page-link" page_num="' + i + '" href="#">' + i + '</a></li>';
+      } //========================================
 
 
-    navHtml += '<li class="page-item">' + '<a class="page-link" page_num="' + data.last_page + '" href="#" aria-label="Next">' + '<span aria-hidden="true">»</span>' + '</a>' + '</li>' + '</ul>';
-    return navHtml;
+      navHtml += '<li class="page-item">' + '<a class="page-link" page_num="' + data.last_page + '" href="#" aria-label="Next">' + '<span aria-hidden="true">»</span>' + '</a>' + '</li>' + '</ul>';
+      return navHtml;
+    }
+
+    return '';
   };
 
   return RegularPaginationBuilder;
 }();
 
 exports["default"] = RegularPaginationBuilder;
-
-/***/ }),
-
-/***/ "./resources/js/admin/modules/categories_module/list/list_api/RegularListApi.js":
-/*!**************************************************************************************!*\
-  !*** ./resources/js/admin/modules/categories_module/list/list_api/RegularListApi.js ***!
-  \**************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../../../api/CategoriesApi */ "./resources/js/admin/api/CategoriesApi.js"));
-
-var RegularListApi =
-/** @class */
-function () {
-  function RegularListApi(state) {
-    this.actionType = 'get_offset_limit';
-    this.state = state;
-  }
-
-  RegularListApi.prototype.getList = function () {
-    var token = document.querySelector('[name=csrf-token]');
-    var formData = {
-      action: {
-        type: this.actionType,
-        current_page: this.state.current_page,
-        sort_by_date: this.state.sort_by_date_desc,
-        per_page: this.state.per_page,
-        deleted: this.state.deleted
-      },
-      'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
-    };
-    var Api = new CategoriesApi_1["default"]('/admin/categories/get_list', 'POST', {
-      formData: JSON.stringify(formData)
-    });
-    var promise = Api.exeq();
-    return promise;
-  };
-
-  return RegularListApi;
-}();
-
-exports["default"] = RegularListApi;
 
 /***/ }),
 
@@ -1152,6 +1039,20 @@ exports["default"] = RegularListApi;
 
 "use strict";
 
+
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -1168,7 +1069,7 @@ var RegularPaginationBuilder_1 = __importDefault(__webpack_require__(/*! ../html
 var RegularRender =
 /** @class */
 function () {
-  function RegularRender(api) {
+  function RegularRender(store) {
     var _this = this;
 
     this.tableContainer = document.getElementById('categories_list_container');
@@ -1187,7 +1088,36 @@ function () {
       }
     };
 
-    this.api = api.getList();
+    this.includeDeleted = function (list) {
+      if (!_this.store.getState('include_deleted')) {
+        list = list.filter(function (val) {
+          return !val.deleted_at;
+        });
+      }
+
+      return list;
+    };
+
+    this.sortByData = function (list) {
+      if (_this.store.getState('sort_by_date_desc')) {
+        list = __spreadArrays(list);
+        list.reverse();
+      }
+
+      return list;
+    };
+
+    this.onlyDeleted = function (list) {
+      if (_this.store.getState('only_deleted')) {
+        list = list.filter(function (val) {
+          return val.deleted_at;
+        });
+      }
+
+      return list;
+    };
+
+    this.store = store;
   }
   /*
      * get items HTML and put it into page table box
@@ -1195,34 +1125,45 @@ function () {
 
 
   RegularRender.prototype.listRender = function (builder) {
-    var _this = this;
-
-    this.api.then(function (data) {
-      var listHtml = '';
-      data.categories.forEach(function (item, key) {
-        listHtml += builder.builder(item, key);
-      });
-
-      _this.append(listHtml);
-
-      var paginationHtml = _this.paginationRender(new RegularPaginationBuilder_1["default"](), data);
-
-      _this.paginationAppend(paginationHtml);
+    var categoriesList = this.store.getState('categories');
+    var perPageNum = this.store.getState('per_page') || 0;
+    var perPage = perPageNum != 0 ? perPageNum : categoriesList.length;
+    var currentPage = this.store.getState('current_page');
+    var offset = currentPage * perPage - (perPage - 1);
+    var limit = currentPage * perPage;
+    var listHtml = '';
+    categoriesList = this.includeDeleted(categoriesList);
+    categoriesList = this.sortByData(categoriesList);
+    categoriesList = this.onlyDeleted(categoriesList);
+    categoriesList = this.includeDeleted(categoriesList);
+    categoriesList.forEach(function (item, key) {
+      if (key >= offset - 1 && key <= limit - 1) {
+        listHtml += builder.builder(item, key + 1);
+      }
     });
+    this.append(listHtml);
+    var paginationHtml = this.paginationRender(new RegularPaginationBuilder_1["default"](), categoriesList);
+    this.paginationAppend(paginationHtml);
   };
 
-  RegularRender.prototype.paginationRender = function (builder, data) {
+  RegularRender.prototype.paginationRender = function (builder, list) {
+    var data = this.store.getAllState();
+    var lastPage = Math.ceil(list.length / data.per_page);
     var objectToBuilder = {
-      start_page: +data.start_button_num,
+      start_page: 1,
       current_page: +data.current_page,
-      last_page: +data.last_page,
-      buttons_num: +data.pages_num
+      last_page: +lastPage,
+      buttons_num: 3
     };
 
     if (objectToBuilder.current_page == objectToBuilder.last_page) {
       /*if last page*/
-      objectToBuilder.start_page = objectToBuilder.current_page - 2;
-      objectToBuilder.buttons_num = objectToBuilder.last_page;
+      if (objectToBuilder.last_page > 2) {
+        objectToBuilder.start_page = objectToBuilder.current_page - 2;
+        objectToBuilder.buttons_num = objectToBuilder.last_page;
+      } else {
+        objectToBuilder.buttons_num = 0;
+      }
     } else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {
       objectToBuilder.start_page = objectToBuilder.current_page - 1;
       objectToBuilder.buttons_num = objectToBuilder.current_page + 1;
@@ -1230,8 +1171,7 @@ function () {
       objectToBuilder.start_page = 1;
     }
 
-    var paginationHtml = builder.build(objectToBuilder);
-    return paginationHtml;
+    return builder.build(objectToBuilder);
   };
 
   RegularRender.prototype.paginationAppend = function (paginationHtml) {
@@ -1252,6 +1192,90 @@ function () {
 }();
 
 exports["default"] = RegularRender;
+
+/***/ }),
+
+/***/ "./resources/js/admin/modules/categories_module/list/state/ListStore.js":
+/*!******************************************************************************!*\
+  !*** ./resources/js/admin/modules/categories_module/list/state/ListStore.js ***!
+  \******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var ListStore =
+/** @class */
+function () {
+  function ListStore() {
+    var _this = this;
+
+    this.listState = {
+      categories: [],
+      current_page: 1,
+      per_page: 6,
+      include_deleted: false,
+      only_deleted: false,
+      sort_by_date_desc: false
+    };
+
+    this.fillCategories = function (categoriesArray, callback, params) {
+      if (callback === void 0) {
+        callback = function callback() {};
+      }
+
+      if (params === void 0) {
+        params = [];
+      }
+
+      _this.listState.categories = categoriesArray;
+      callback.apply(void 0, params);
+    };
+    /*
+    * get
+    * */
+
+
+    this.getState = function (stateField) {
+      return _this.listState[stateField];
+    };
+    /*
+    *
+    * set
+    * */
+
+
+    this.setState = function (stateField, stateValue, callback, params) {
+      if (callback === void 0) {
+        callback = function callback() {};
+      }
+
+      if (params === void 0) {
+        params = [];
+      }
+
+      _this.listState[stateField] = stateValue;
+      callback.apply(void 0, params);
+    };
+    /*
+    * get all
+    * */
+
+
+    this.getAllState = function () {
+      return _this.listState;
+    };
+  }
+
+  return ListStore;
+}();
+
+exports["default"] = ListStore;
 
 /***/ }),
 

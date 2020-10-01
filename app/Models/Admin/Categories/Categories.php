@@ -25,6 +25,9 @@ class Categories extends Model
         }
 
     }
+    public function getAllCategories(){
+       return $this->all();
+    }
 
     //
 }

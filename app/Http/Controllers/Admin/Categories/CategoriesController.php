@@ -20,7 +20,7 @@ class CategoriesController extends BaseController
         $view = view('admin.content.categories.categories',$data);
         return $view;
     }
-    private function getList(){
+    private function getJsonList(){
          $list_controller = new ListController();
          return $list_controller->getList();
     }
@@ -35,7 +35,7 @@ class CategoriesController extends BaseController
             'main_menu' => $this->getMenu(),
             'css'=>$this->getIp().$this->css,
             'js'=>$this->getIp().$this->js,
-            'list'=>$this->getList(),
+//            'list'=>$this->getList(),
 
         );
     }

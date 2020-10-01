@@ -1,55 +1,54 @@
 
-import ListStor from "./ListStor";
+import ListStore from "./state/ListStore";
 import RegularRender from "./list_render/RegularRender";
-import RegularListApi from "./list_api/RegularListApi";
+// import RegularListApi from "./list_api/RegularListApi";
 import RegularListBuilder from "./html_list_builder/RegularListBuilder";
+import CategoriesApi from "../../../api/CategoriesApi";
 
 class ListController {
-    private stor = new ListStor()
+    private store = new ListStore()
+    public getAllList=()=>{
+        const token = document.querySelector('[name=csrf-token]')
+        const formData = {
+            action: {
+            },
+            'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+        }
+        const Api = new CategoriesApi('/admin/categories/get_list', 'POST', {formData: JSON.stringify(formData)})
+        const promise: any = Api.exeq()
+        promise.then((data:object)=> {
+           this.store.fillCategories(data, this.regularPage,[1])
 
-
-    regularPage = (pageNum: number) => {
-        this.stor.setState('current_page', pageNum)
-        const render = new RegularRender(new RegularListApi(this.stor.getAllState()))
+           }
+       )
+    }
+   public regularPage = (curentPage: number) => {
+        this.store.setState('current_page', curentPage)
+        const render = new RegularRender(this.store)
         render.listRender(new RegularListBuilder())
     }
 
     public sortByDate=()=>{
-        this.stor.setState('sort_by_date_desc',!this.stor.getState('sort_by_date_desc'))
-        const currentPageButton = document.querySelector('ul.pagination li.current a')
-        let currentPage = 1
-        if(currentPageButton){
-            let pageNum = currentPageButton.getAttribute('page_num')
-            if(pageNum) {
-                currentPage = parseInt(pageNum)
-            }
-            this.stor.setState('current_page',currentPage)
-            const render = new RegularRender(new RegularListApi(this.stor.getAllState()))
-            render.listRender(new RegularListBuilder())
-        }
+        this.store.setState('sort_by_date_desc',
+            !this.store.getState('sort_by_date_desc'))
+        this.regularPage(1)
     }
-
-
 
     public includeDeleted():void{
-        this.stor.setState('deleted',!this.stor.getState('deleted'))
-        const currentPageButton = document.querySelector('ul.pagination li.current a')
-        let currentPage =1
-        if(currentPageButton){
-            let pageNum = currentPageButton.getAttribute('page_num')
-            if(pageNum) {
-                currentPage = parseInt(pageNum)
-            }
-            this.stor.setState('current_page',currentPage)
-            const render = new RegularRender(new RegularListApi(this.stor.getAllState()))
-            render.listRender(new RegularListBuilder())
-        }
+         this.store.setState('include_deleted',
+             !this.store.getState('include_deleted'),
+             this.regularPage,[1])
     }
-    // public justDeleted(isChecked:boolean):void{
-    //
-    //     // this.actionType = isChecked?'just_deleted':'get_offset_limit'
-    //     // this.getListFromApi()
-    // }
+    public onlyDeleted():void{
+        const includeDeletedElement:any = document.getElementById('include_deleted')
+        if(includeDeletedElement && !includeDeletedElement.checked){
+            includeDeletedElement.click()
+        }
+
+        this.store.setState('only_deleted',
+            !this.store.getState('only_deleted'),
+            this.regularPage,[1])
+    }
 }
 
 export default ListController
