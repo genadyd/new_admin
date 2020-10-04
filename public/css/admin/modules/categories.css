@@ -2,6 +2,17 @@
   display: none;
 }
 
+#content_container #category_form_container #list_open_close_button {
+  border: solid 1px #ED7117;
+  color: #ED7117;
+  line-height: 14px;
+}
+
+#content_container #category_form_container #list_open_close_button:hover {
+  color: #fff;
+  background-color: #ED7117;
+}
+
 #content_container #category_form_container .category_data .input_block .error_alert {
   display: none;
   height: auto;
@@ -64,6 +75,25 @@
 }
 
 #content_container #category_form_container #category_form_submit {
+  background-color: #ED7117;
+  color: #fff;
+}
+
+#content_container #categories_control_panel #per_page {
+  width: 34%;
+}
+
+#content_container #categories_control_panel #categories_search_button {
+  cursor: pointer;
+}
+
+#content_container #categories_control_panel .btn-outline {
+  border: solid 1px #ED7117;
+  color: #ED7117;
+  line-height: 14px;
+}
+
+#content_container #categories_control_panel .btn-outline:hover {
   background-color: #ED7117;
   color: #fff;
 }

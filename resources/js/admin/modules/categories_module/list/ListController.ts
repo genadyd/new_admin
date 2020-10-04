@@ -18,7 +18,10 @@ class ListController {
         const promise: any = Api.exeq()
         promise.then((data:object)=> {
            this.store.fillCategories(data, this.regularPage,[1])
-
+            const perPageInput:any =  document.getElementById('per_page')
+                if(perPageInput) {
+                    perPageInput.value = this.store.getState('per_page')
+                }
            }
        )
     }
@@ -34,7 +37,7 @@ class ListController {
         this.regularPage(1)
     }
 
-    public includeDeleted():void{
+    public includeDeleted=():void=>{
          this.store.setState('include_deleted',
              !this.store.getState('include_deleted'),
              this.regularPage,[1])
@@ -44,10 +47,20 @@ class ListController {
         if(includeDeletedElement && !includeDeletedElement.checked){
             includeDeletedElement.click()
         }
-
         this.store.setState('only_deleted',
             !this.store.getState('only_deleted'),
             this.regularPage,[1])
+    }
+    public changePerPageNum(event:any){
+        let newVal = event.target.value
+        this.store.setState('per_page', +newVal)
+        this.regularPage(1)
+    }
+    public formOpenClose(){
+        const radioButton = document.getElementById('form_open_close')
+        if(radioButton){
+            radioButton.checked=true
+        }
     }
 }
 

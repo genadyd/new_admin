@@ -1,5 +1,14 @@
 #category_form_container{
     display: none;
+    #list_open_close_button{
+        border: solid 1px $orange-color;
+        color: $orange-color;
+        line-height: 14px;
+        &:hover{
+            color: #fff;
+            background-color: $orange-color;
+        }
+    }
     .category_data{
         .input_block {
             .error_alert{

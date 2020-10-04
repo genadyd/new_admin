@@ -5,8 +5,8 @@
     @include('admin.content.categories.padginaton')
     @else
         @include('admin.content.categories.categories_list_control_panel')
-        @include('admin.content.categories.list_new.categories_table')
-        @include('admin.content.categories.list_new.padginaton')
+        @include('admin.content.categories.categories_table')
+        @include('admin.content.categories.padginaton')
     @endif
 </section>
 

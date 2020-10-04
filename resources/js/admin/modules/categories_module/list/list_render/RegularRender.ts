@@ -17,11 +17,14 @@ class RegularRender implements ListRenderInterface{
             const currentPage = this.store.getState('current_page')
             const offset = currentPage * perPage-(perPage-1)
             const limit = currentPage * perPage
+
             let listHtml:any = ''
             categoriesList = this.includeDeleted(categoriesList)
             categoriesList = this.sortByData(categoriesList)
             categoriesList = this.onlyDeleted(categoriesList)
             categoriesList = this.includeDeleted(categoriesList)
+
+            this.setListItemsNumberMaxParam([...categoriesList])
             categoriesList.forEach((item:any, key:number)=>{
                 if(key>=(offset-1) && key<=limit-1) {
                     listHtml += builder.builder(item, key+1)
@@ -59,12 +62,24 @@ class RegularRender implements ListRenderInterface{
         return list;
     }
     private onlyDeleted = (list:any[])=>{
-
         if( this.store.getState('only_deleted') ){
             list = list.filter((val:any)=> val.deleted_at )
         }
-
         return list;
+    }
+    private setListItemsNumberMaxParam=(list:any)=>{
+        const perPageInput:any =  document.getElementById('per_page')
+        if(perPageInput) {
+            let len:number = list.length
+            perPageInput.setAttribute('max', len)
+            if(this.store.getState('per_page')>len){
+                perPageInput.value = len
+                // perPageInput.disabled = true
+            }else{
+                // perPageInput.disabled = false
+                perPageInput.value = this.store.getState('per_page')
+            }
+        }
     }
     paginationRender(builder:PaginationBuilderInterface, list:any[]):string {
         const data = this.store.getAllState()
@@ -73,13 +88,16 @@ class RegularRender implements ListRenderInterface{
                 start_page : 1,
                 current_page : +data.current_page,
                 last_page : +lastPage,
-                buttons_num : 3
+                buttons_num : lastPage<3? lastPage:3
             }
             if (objectToBuilder.current_page == objectToBuilder.last_page) { /*if last page*/
                 if(objectToBuilder.last_page>2) {
                     objectToBuilder.start_page = objectToBuilder.current_page - 2
                     objectToBuilder.buttons_num = objectToBuilder.last_page
-                }else{
+                }else if(objectToBuilder.last_page == 2){
+                    objectToBuilder.start_page = objectToBuilder.current_page - 1
+                    objectToBuilder.buttons_num = objectToBuilder.last_page
+                } else{
                     objectToBuilder.buttons_num = 0
                 }
             } else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {

@@ -151,6 +151,12 @@ class Form {
 
         }
     }
+    listOpenClose = ()=>{
+       const radioButton = document.getElementById('list_open_close')
+        if(radioButton){
+            radioButton.checked = true
+        }
+    }
 
 }
 

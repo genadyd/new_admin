@@ -47,6 +47,21 @@ var RegularRender = /** @class */ (function () {
             }
             return list;
         };
+        this.setListItemsNumberMaxParam = function (list) {
+            var perPageInput = document.getElementById('per_page');
+            if (perPageInput) {
+                var len = list.length;
+                perPageInput.setAttribute('max', len);
+                if (_this.store.getState('per_page') > len) {
+                    perPageInput.value = len;
+                    // perPageInput.disabled = true
+                }
+                else {
+                    // perPageInput.disabled = false
+                    perPageInput.value = _this.store.getState('per_page');
+                }
+            }
+        };
         this.store = store;
     }
     /*
@@ -64,6 +79,7 @@ var RegularRender = /** @class */ (function () {
         categoriesList = this.sortByData(categoriesList);
         categoriesList = this.onlyDeleted(categoriesList);
         categoriesList = this.includeDeleted(categoriesList);
+        this.setListItemsNumberMaxParam(__spreadArrays(categoriesList));
         categoriesList.forEach(function (item, key) {
             if (key >= (offset - 1) && key <= limit - 1) {
                 listHtml += builder.builder(item, key + 1);
@@ -80,11 +96,15 @@ var RegularRender = /** @class */ (function () {
             start_page: 1,
             current_page: +data.current_page,
             last_page: +lastPage,
-            buttons_num: 3
+            buttons_num: lastPage < 3 ? lastPage : 3
         };
         if (objectToBuilder.current_page == objectToBuilder.last_page) { /*if last page*/
             if (objectToBuilder.last_page > 2) {
                 objectToBuilder.start_page = objectToBuilder.current_page - 2;
+                objectToBuilder.buttons_num = objectToBuilder.last_page;
+            }
+            else if (objectToBuilder.last_page == 2) {
+                objectToBuilder.start_page = objectToBuilder.current_page - 1;
                 objectToBuilder.buttons_num = objectToBuilder.last_page;
             }
             else {

@@ -151,6 +151,12 @@ var Form = /** @class */ (function () {
                 }
             }
         };
+        this.listOpenClose = function () {
+            var radioButton = document.getElementById('list_open_close');
+            if (radioButton) {
+                radioButton.checked = true;
+            }
+        };
     }
     return Form;
 }());

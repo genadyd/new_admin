@@ -45,12 +45,21 @@ var FormListeners = /** @class */ (function () {
                 }
             });
         };
+        this.listOpenClose = function () {
+            var openCloseButton = document.getElementById('list_open_close_button');
+            if (openCloseButton) {
+                openCloseButton.onclick = function () {
+                    _this.formController.listOpenClose();
+                };
+            }
+        };
         this.textField = new TextField_1.default();
         this.formController.validatorInit();
         this.add();
         this.addTextField();
         this.textFieldRemove();
         this.textFieldOpenClose();
+        this.listOpenClose();
     }
     return FormListeners;
 }());

@@ -496,6 +496,14 @@ function () {
         }
       }
     };
+
+    this.listOpenClose = function () {
+      var radioButton = document.getElementById('list_open_close');
+
+      if (radioButton) {
+        radioButton.checked = true;
+      }
+    };
   }
 
   return Form;
@@ -573,12 +581,23 @@ function () {
       });
     };
 
+    this.listOpenClose = function () {
+      var openCloseButton = document.getElementById('list_open_close_button');
+
+      if (openCloseButton) {
+        openCloseButton.onclick = function () {
+          _this.formController.listOpenClose();
+        };
+      }
+    };
+
     this.textField = new TextField_1["default"]();
     this.formController.validatorInit();
     this.add();
     this.addTextField();
     this.textFieldRemove();
     this.textFieldOpenClose();
+    this.listOpenClose();
   }
 
   return FormListeners;
@@ -792,6 +811,12 @@ function () {
       var promise = Api.exeq();
       promise.then(function (data) {
         _this.store.fillCategories(data, _this.regularPage, [1]);
+
+        var perPageInput = document.getElementById('per_page');
+
+        if (perPageInput) {
+          perPageInput.value = _this.store.getState('per_page');
+        }
       });
     };
 
@@ -807,11 +832,11 @@ function () {
 
       _this.regularPage(1);
     };
-  }
 
-  ListController.prototype.includeDeleted = function () {
-    this.store.setState('include_deleted', !this.store.getState('include_deleted'), this.regularPage, [1]);
-  };
+    this.includeDeleted = function () {
+      _this.store.setState('include_deleted', !_this.store.getState('include_deleted'), _this.regularPage, [1]);
+    };
+  }
 
   ListController.prototype.onlyDeleted = function () {
     var includeDeletedElement = document.getElementById('include_deleted');
@@ -821,6 +846,20 @@ function () {
     }
 
     this.store.setState('only_deleted', !this.store.getState('only_deleted'), this.regularPage, [1]);
+  };
+
+  ListController.prototype.changePerPageNum = function (event) {
+    var newVal = event.target.value;
+    this.store.setState('per_page', +newVal);
+    this.regularPage(1);
+  };
+
+  ListController.prototype.formOpenClose = function () {
+    var radioButton = document.getElementById('form_open_close');
+
+    if (radioButton) {
+      radioButton.checked = true;
+    }
   };
 
   return ListController;
@@ -926,6 +965,10 @@ function () {
         }
       }
     };
+    /*
+    * only deleted ****************
+    * */
+
 
     this.onlyDeleted = function () {
       if (_this.listContainer) {
@@ -948,7 +991,37 @@ function () {
     this.sortByDate();
     this.includeDeleted();
     this.onlyDeleted();
+    this.changePerPageNum();
+    this.formOpenClose();
   }
+  /*
+  * change per page num
+  * */
+
+
+  ListListeners.prototype.changePerPageNum = function () {
+    var _this = this;
+
+    var perPageInput = document.getElementById('per_page');
+
+    if (perPageInput) {
+      perPageInput.oninput = function (e) {
+        _this.listController.changePerPageNum(e);
+      };
+    }
+  };
+
+  ListListeners.prototype.formOpenClose = function () {
+    var _this = this;
+
+    var addNewButton = document.getElementById('add_new_category_form_open');
+
+    if (addNewButton) {
+      addNewButton.onclick = function (e) {
+        _this.listController.formOpenClose();
+      };
+    }
+  };
 
   return ListListeners;
 }();
@@ -1117,6 +1190,22 @@ function () {
       return list;
     };
 
+    this.setListItemsNumberMaxParam = function (list) {
+      var perPageInput = document.getElementById('per_page');
+
+      if (perPageInput) {
+        var len = list.length;
+        perPageInput.setAttribute('max', len);
+
+        if (_this.store.getState('per_page') > len) {
+          perPageInput.value = len; // perPageInput.disabled = true
+        } else {
+          // perPageInput.disabled = false
+          perPageInput.value = _this.store.getState('per_page');
+        }
+      }
+    };
+
     this.store = store;
   }
   /*
@@ -1136,6 +1225,7 @@ function () {
     categoriesList = this.sortByData(categoriesList);
     categoriesList = this.onlyDeleted(categoriesList);
     categoriesList = this.includeDeleted(categoriesList);
+    this.setListItemsNumberMaxParam(__spreadArrays(categoriesList));
     categoriesList.forEach(function (item, key) {
       if (key >= offset - 1 && key <= limit - 1) {
         listHtml += builder.builder(item, key + 1);
@@ -1153,13 +1243,16 @@ function () {
       start_page: 1,
       current_page: +data.current_page,
       last_page: +lastPage,
-      buttons_num: 3
+      buttons_num: lastPage < 3 ? lastPage : 3
     };
 
     if (objectToBuilder.current_page == objectToBuilder.last_page) {
       /*if last page*/
       if (objectToBuilder.last_page > 2) {
         objectToBuilder.start_page = objectToBuilder.current_page - 2;
+        objectToBuilder.buttons_num = objectToBuilder.last_page;
+      } else if (objectToBuilder.last_page == 2) {
+        objectToBuilder.start_page = objectToBuilder.current_page - 1;
         objectToBuilder.buttons_num = objectToBuilder.last_page;
       } else {
         objectToBuilder.buttons_num = 0;

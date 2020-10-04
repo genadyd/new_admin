@@ -1,8 +1,11 @@
 
 <section id="category_form_container" class="pb-5">
+    <div class="d-flex justify-content-end">
+    <button type="button" class="btn btn-outline" id="list_open_close_button"><small>categories list</small></button>
+    </div>
     <form id="category_form">
         <div class="category_data">
-            <div class="form-row mt-2">
+            <div class="form-row">
                 <div class="col-lg-6 col-12 mt-3 input_block">
                     <label for="category_name">Name</label>
                     <input type="text" id="category_name" name="category_name" class="form-control "

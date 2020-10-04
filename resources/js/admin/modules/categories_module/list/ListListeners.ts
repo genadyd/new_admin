@@ -10,6 +10,8 @@ class ListListeners {
         this.sortByDate()
         this.includeDeleted()
         this.onlyDeleted()
+        this.changePerPageNum()
+        this.formOpenClose()
     }
     getList=()=>{
        this.listController.getAllList()
@@ -69,6 +71,9 @@ class ListListeners {
 
         }
     }
+    /*
+    * only deleted ****************
+    * */
     onlyDeleted = () => {
         if (this.listContainer) {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #just_deleted')
@@ -81,6 +86,25 @@ class ListListeners {
                 })
             }
 
+        }
+    }
+    /*
+    * change per page num
+    * */
+    changePerPageNum(){
+        const perPageInput = document.getElementById('per_page')
+        if(perPageInput){
+            perPageInput.oninput = (e:any)=>{
+                this.listController.changePerPageNum(e)
+            }
+        }
+    }
+    formOpenClose(){
+        const addNewButton = document.getElementById('add_new_category_form_open')
+        if(addNewButton) {
+            addNewButton.onclick = ((e) => {
+                this.listController.formOpenClose()
+            })
         }
     }
 }

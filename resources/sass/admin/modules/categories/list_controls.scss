@@ -1,3 +1,19 @@
-#categories_control_panel{
+#categories_control_panel {
+    #per_page {
+        width: 34%;
+    }
+    #categories_search_button{
+        cursor:pointer;
+    }
 
+    .btn-outline {
+        border: solid 1px $orange-color;
+        color: $orange-color;
+        line-height: 14px;
+
+        &:hover {
+            background-color: $orange-color;
+            color: #fff;
+        }
+    }
 }

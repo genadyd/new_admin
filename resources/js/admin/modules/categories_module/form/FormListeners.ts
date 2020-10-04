@@ -11,6 +11,7 @@ class FormListeners {
         this.addTextField()
         this.textFieldRemove()
         this.textFieldOpenClose()
+        this.listOpenClose()
     }
      add =()=>{
         const button = document.getElementById('category_form_submit')
@@ -45,5 +46,13 @@ class FormListeners {
             }
         })
     }
+    listOpenClose=()=>{
+       const openCloseButton = document.getElementById('list_open_close_button')
+        if(openCloseButton){
+            openCloseButton.onclick = ()=>{
+                this.formController.listOpenClose()
+            }
+        }
+}
   }
   export default FormListeners
