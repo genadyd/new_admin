@@ -54,13 +54,32 @@ var RegularRender = /** @class */ (function () {
                 perPageInput.setAttribute('max', len);
                 if (_this.store.getState('per_page') > len) {
                     perPageInput.value = len;
-                    // perPageInput.disabled = true
                 }
                 else {
-                    // perPageInput.disabled = false
                     perPageInput.value = _this.store.getState('per_page');
                 }
             }
+        };
+        this.categoriesSearch = function (list) {
+            var searchString = _this.store.getState('search_string');
+            /*
+               strip slashas
+                */
+            list.forEach(function (item, key) {
+                item.name = item.name.replace(/(<([^>]+)>)/gi, "");
+                item.heading = item.heading.replace(/(<([^>]+)>)/gi, "");
+            });
+            if (searchString) {
+                var pattern_1 = new RegExp(searchString);
+                list = list.filter(function (val) {
+                    return pattern_1.test(val.heading) || pattern_1.test(val.name);
+                });
+                list.forEach(function (item, key) {
+                    list[key].name = item.name.replace(searchString, "<span class=\"finded\">" + searchString + "</span>");
+                    list[key].heading = item.heading.replace(searchString, "<span class=\"finded\">" + searchString + "</span>");
+                });
+            }
+            return list;
         };
         this.store = store;
     }
@@ -75,6 +94,7 @@ var RegularRender = /** @class */ (function () {
         var offset = currentPage * perPage - (perPage - 1);
         var limit = currentPage * perPage;
         var listHtml = '';
+        categoriesList = this.categoriesSearch(categoriesList);
         categoriesList = this.includeDeleted(categoriesList);
         categoriesList = this.sortByData(categoriesList);
         categoriesList = this.onlyDeleted(categoriesList);

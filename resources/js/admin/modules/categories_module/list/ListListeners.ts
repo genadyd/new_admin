@@ -12,6 +12,7 @@ class ListListeners {
         this.onlyDeleted()
         this.changePerPageNum()
         this.formOpenClose()
+        this.categoriesSearch()
     }
     getList=()=>{
        this.listController.getAllList()
@@ -99,14 +100,28 @@ class ListListeners {
             }
         }
     }
+    /*
+    * form open close
+    * */
     formOpenClose(){
         const addNewButton = document.getElementById('add_new_category_form_open')
         if(addNewButton) {
-            addNewButton.onclick = ((e) => {
+            addNewButton.onclick = (() => {
                 this.listController.formOpenClose()
             })
         }
     }
+    /*
+    *
+    * search by name or heading ============
+    * */
+    categoriesSearch(){
+        const searchInput = document.getElementById('categories_search_input')
+        if(searchInput){
+            searchInput.oninput = (e)=>{
+                this.listController.searchInput(e)
+            }
+        }
+    }
 }
-
 export default ListListeners

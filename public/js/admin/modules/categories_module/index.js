@@ -862,6 +862,13 @@ function () {
     }
   };
 
+  ListController.prototype.searchInput = function (event) {
+    var target = event.target;
+    var inputValue = target.value;
+    this.store.setState('search_string', inputValue);
+    this.regularPage(1);
+  };
+
   return ListController;
 }();
 
@@ -993,6 +1000,7 @@ function () {
     this.onlyDeleted();
     this.changePerPageNum();
     this.formOpenClose();
+    this.categoriesSearch();
   }
   /*
   * change per page num
@@ -1010,6 +1018,10 @@ function () {
       };
     }
   };
+  /*
+  * form open close
+  * */
+
 
   ListListeners.prototype.formOpenClose = function () {
     var _this = this;
@@ -1017,8 +1029,25 @@ function () {
     var addNewButton = document.getElementById('add_new_category_form_open');
 
     if (addNewButton) {
-      addNewButton.onclick = function (e) {
+      addNewButton.onclick = function () {
         _this.listController.formOpenClose();
+      };
+    }
+  };
+  /*
+  *
+  * search by name or heading ============
+  * */
+
+
+  ListListeners.prototype.categoriesSearch = function () {
+    var _this = this;
+
+    var searchInput = document.getElementById('categories_search_input');
+
+    if (searchInput) {
+      searchInput.oninput = function (e) {
+        _this.listController.searchInput(e);
       };
     }
   };
@@ -1198,12 +1227,37 @@ function () {
         perPageInput.setAttribute('max', len);
 
         if (_this.store.getState('per_page') > len) {
-          perPageInput.value = len; // perPageInput.disabled = true
+          perPageInput.value = len;
         } else {
-          // perPageInput.disabled = false
           perPageInput.value = _this.store.getState('per_page');
         }
       }
+    };
+
+    this.categoriesSearch = function (list) {
+      var searchString = _this.store.getState('search_string');
+      /*
+         strip slashas
+          */
+
+
+      list.forEach(function (item, key) {
+        item.name = item.name.replace(/(<([^>]+)>)/gi, "");
+        item.heading = item.heading.replace(/(<([^>]+)>)/gi, "");
+      });
+
+      if (searchString) {
+        var pattern_1 = new RegExp(searchString);
+        list = list.filter(function (val) {
+          return pattern_1.test(val.heading) || pattern_1.test(val.name);
+        });
+        list.forEach(function (item, key) {
+          list[key].name = item.name.replace(searchString, "<span class=\"finded\">" + searchString + "</span>");
+          list[key].heading = item.heading.replace(searchString, "<span class=\"finded\">" + searchString + "</span>");
+        });
+      }
+
+      return list;
     };
 
     this.store = store;
@@ -1221,6 +1275,7 @@ function () {
     var offset = currentPage * perPage - (perPage - 1);
     var limit = currentPage * perPage;
     var listHtml = '';
+    categoriesList = this.categoriesSearch(categoriesList);
     categoriesList = this.includeDeleted(categoriesList);
     categoriesList = this.sortByData(categoriesList);
     categoriesList = this.onlyDeleted(categoriesList);
@@ -1314,7 +1369,8 @@ function () {
       per_page: 6,
       include_deleted: false,
       only_deleted: false,
-      sort_by_date_desc: false
+      sort_by_date_desc: false,
+      search_string: ''
     };
 
     this.fillCategories = function (categoriesArray, callback, params) {

@@ -31,7 +31,7 @@ class ListController {
         render.listRender(new RegularListBuilder())
     }
 
-    public sortByDate=()=>{
+    public sortByDate = ()=>{
         this.store.setState('sort_by_date_desc',
             !this.store.getState('sort_by_date_desc'))
         this.regularPage(1)
@@ -61,6 +61,12 @@ class ListController {
         if(radioButton){
             radioButton.checked=true
         }
+    }
+    public searchInput(event:any){
+        const target = event.target;
+        let inputValue = target.value
+        this.store.setState('search_string',inputValue)
+        this.regularPage(1)
     }
 }
 
