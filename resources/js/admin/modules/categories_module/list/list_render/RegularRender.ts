@@ -19,6 +19,7 @@ class RegularRender implements ListRenderInterface{
             const limit = currentPage * perPage
 
             let listHtml:any = ''
+            categoriesList = this.categoriesSearch(categoriesList)
             categoriesList = this.includeDeleted(categoriesList)
             categoriesList = this.sortByData(categoriesList)
             categoriesList = this.onlyDeleted(categoriesList)
@@ -74,13 +75,34 @@ class RegularRender implements ListRenderInterface{
             perPageInput.setAttribute('max', len)
             if(this.store.getState('per_page')>len){
                 perPageInput.value = len
-                // perPageInput.disabled = true
             }else{
-                // perPageInput.disabled = false
                 perPageInput.value = this.store.getState('per_page')
             }
         }
     }
+    private categoriesSearch =(list:any)=>{
+        const searchString = this.store.getState('search_string')
+        /*
+           strip slashas
+            */
+        list.forEach((item:any, key:number) => {
+            item.name = item.name.replace(/(<([^>]+)>)/gi, "")
+            item.heading = item.heading.replace(/(<([^>]+)>)/gi, "")
+        })
+        if(searchString){
+            const pattern = new RegExp(searchString)
+            list = list.filter((val:any)=>{
+                 return pattern.test(val.heading)||pattern.test(val.name)
+            })
+            list.forEach((item:any, key:number) => {
+                list[key].name =  item.name.replace(searchString, `<span class="finded">${searchString}</span>`)
+                list[key].heading =  item.heading.replace(searchString, `<span class="finded">${searchString}</span>`)
+            })
+        }
+        return list;
+    }
+
+
     paginationRender(builder:PaginationBuilderInterface, list:any[]):string {
         const data = this.store.getAllState()
         const lastPage = Math.ceil(list.length / data.per_page)

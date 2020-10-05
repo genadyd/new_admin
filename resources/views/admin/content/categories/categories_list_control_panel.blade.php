@@ -15,14 +15,16 @@
             <small>Sort by Date</small></label>
     </div>
     <div class="col-2 d-flex justify-content-start align-items-center">
-        <input type="number" min="0" class="form-control  mr-4" id="per_page" value="Mark" required>
+        <input type="number" min="0" class="form-control h-25  mr-2" id="per_page" value="Mark" required>
         <label  for="per_page" class="m-0">
             <small>Items Per Page</small>
         </label>
     </div>
-    <div class="col-2 d-flex justify-content-center align-items-center" id="categories_search_button">
-            <span class="material-icons">search</span>
-            <small>search</small>
+    <div class="col-2 d-flex justify-content-center align-items-center p-0" id="categories_search_button">
+        <input type="text" class="form-control h-25  m-0" id="categories_search_input" placeholder="search">
+{{--            <span class="material-icons">search</span>--}}
+{{--            <small>search</small>--}}
+
     </div>
     <div class="col-2 d-flex justify-content-end align-items-center p-0">
         <button type="button" id="add_new_category_form_open" class="btn btn-outline"><small>add category</small></button>

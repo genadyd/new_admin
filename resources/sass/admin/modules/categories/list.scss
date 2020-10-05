@@ -1,5 +1,15 @@
 #categories_list_container{
     display: none;
+    table{
+        tbody{
+           td{
+               .finded{
+                   background-color: $orange-color;
+                   color:#fff
+               }
+           }
+        }
+    }
     .pagination{
         .current{
             background: #bebebe;

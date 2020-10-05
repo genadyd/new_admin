@@ -1,12 +1,13 @@
-type store ={ [index:string]:[]|number|boolean }
+
 class ListStore{
-   private listState:store = {
+   private listState:any = {
        categories:[],
        current_page:1,
        per_page:6,
        include_deleted: false,
        only_deleted:false,
        sort_by_date_desc:false,
+       search_string:''
    }
 
    public fillCategories = (categoriesArray:any, callback:any=()=>{}, params:any[]=[])=>{
@@ -16,7 +17,7 @@ class ListStore{
    /*
    * get
    * */
-   public getState=(stateField:string):number|boolean|[]=>this.listState[stateField]
+   public getState=(stateField:string):any=>this.listState[stateField]
     /*
     *
     * set

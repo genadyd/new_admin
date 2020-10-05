@@ -102,6 +102,11 @@
   display: none;
 }
 
+#content_container #categories_list_container table tbody td .finded {
+  background-color: #ED7117;
+  color: #fff;
+}
+
 #content_container #categories_list_container .pagination .current {
   background: #bebebe;
 }
