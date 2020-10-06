@@ -5,7 +5,7 @@
         <th scope="col">id</th>
         <th scope="col">name</th>
         <th scope="col">heading</th>
-        <th scope="col">num of textfields</th>
+        <th scope="col">textfields</th>
         <th scope="col">controls</th>
     </tr>
     </thead>

@@ -1,13 +1,20 @@
 #categories_list_container{
     display: none;
     table{
+        font-size: 14px;
         tbody{
-           td{
-               .finded{
-                   background-color: $orange-color;
-                   color:#fff
-               }
-           }
+            tr {
+                &.deleted{
+                    background: $orange-dark;
+                    color:#fff;
+                }
+                td {
+                    .finded {
+                        background-color: $orange-color;
+                        color: #fff
+                    }
+                }
+            }
         }
     }
     .pagination{
