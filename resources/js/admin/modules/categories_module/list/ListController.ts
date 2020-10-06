@@ -1,12 +1,10 @@
-
-import ListStore from "./state/ListStore";
 import RegularRender from "./list_render/RegularRender";
-// import RegularListApi from "./list_api/RegularListApi";
 import RegularListBuilder from "./html_list_builder/RegularListBuilder";
 import CategoriesApi from "../../../api/CategoriesApi";
+import CategoriesState from "../../../states/content/categories/CategoriesState";
 
 class ListController {
-    private store = new ListStore()
+    private store = new CategoriesState()
     public getAllList=()=>{
         const token = document.querySelector('[name=csrf-token]')
         const formData = {
@@ -17,7 +15,8 @@ class ListController {
         const Api = new CategoriesApi('/admin/categories/get_list', 'POST', {formData: JSON.stringify(formData)})
         const promise: any = Api.exeq()
         promise.then((data:object)=> {
-           this.store.fillCategories(data, this.regularPage,[1])
+           this.store.fill(data,'categories')
+            this.regularPage(1)
             const perPageInput:any =  document.getElementById('per_page')
                 if(perPageInput) {
                     perPageInput.value = this.store.getState('per_page')
@@ -39,8 +38,9 @@ class ListController {
 
     public includeDeleted=():void=>{
          this.store.setState('include_deleted',
-             !this.store.getState('include_deleted'),
-             this.regularPage,[1])
+             !this.store.getState('include_deleted'))
+        this.regularPage(1)
+
     }
     public onlyDeleted():void{
         const includeDeletedElement:any = document.getElementById('include_deleted')
@@ -48,8 +48,8 @@ class ListController {
             includeDeletedElement.click()
         }
         this.store.setState('only_deleted',
-            !this.store.getState('only_deleted'),
-            this.regularPage,[1])
+            !this.store.getState('only_deleted'))
+        this.regularPage(1)
     }
     public changePerPageNum(event:any){
         let newVal = event.target.value

@@ -1,4 +1,4 @@
-import FormFieldsValidator from "../../../lib/FormFieldsValidator";
+import FormFieldsValidator from "../../../lib/form_validator/FormFieldsValidator";
 import CategoriesApi from "../../../api/CategoriesApi";
 
 

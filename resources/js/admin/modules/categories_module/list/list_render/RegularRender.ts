@@ -1,11 +1,15 @@
 import RegularPaginationBuilder from "../html_pagination_builder/RegularPaginationBuilder"
+import CategoriesPagination from "../../../../lib/list_pagination/content/categories/CategoriesPagination";
+import PagitationInterface from "../../../../lib/list_pagination/PagitationInterface";
 
 
 class RegularRender implements ListRenderInterface{
     private store
+    private pagination:PagitationInterface;
     private tableContainer:HTMLElement|null = document.getElementById('categories_list_container')
     constructor(store:any) {
         this.store = store
+        this.pagination = new CategoriesPagination( this.store)
     }
     /*
        * get items HTML and put it into page table box
@@ -17,15 +21,15 @@ class RegularRender implements ListRenderInterface{
             const currentPage = this.store.getState('current_page')
             const offset = currentPage * perPage-(perPage-1)
             const limit = currentPage * perPage
-
             let listHtml:any = ''
-            categoriesList = this.categoriesSearch(categoriesList)
-            categoriesList = this.includeDeleted(categoriesList)
-            categoriesList = this.sortByData(categoriesList)
-            categoriesList = this.onlyDeleted(categoriesList)
-            categoriesList = this.includeDeleted(categoriesList)
+            categoriesList = this.pagination.searchItems(categoriesList)
+            categoriesList = this.pagination.includeDeleted(categoriesList)
+            categoriesList = this.pagination.sortByData(categoriesList)
+            categoriesList = this.pagination.onlyDeleted(categoriesList)
+            categoriesList = this.pagination.includeDeleted(categoriesList)
 
-            this.setListItemsNumberMaxParam([...categoriesList])
+        this.pagination.setListItemsNumberMaxParam([...categoriesList])
+
             categoriesList.forEach((item:any, key:number)=>{
                 if(key>=(offset-1) && key<=limit-1) {
                     listHtml += builder.builder(item, key+1)
@@ -49,85 +53,8 @@ class RegularRender implements ListRenderInterface{
             }
         }
     }
-    private includeDeleted = (list:any[])=>{
-        if(!this.store.getState('include_deleted')){
-            list = list.filter((val:any)=> !val.deleted_at )
-        }
-        return list;
-    }
-    private sortByData = (list:any[])=>{
-        if(this.store.getState('sort_by_date_desc')){
-            list = [...list]
-            list.reverse();
-        }
-        return list;
-    }
-    private onlyDeleted = (list:any[])=>{
-        if( this.store.getState('only_deleted') ){
-            list = list.filter((val:any)=> val.deleted_at )
-        }
-        return list;
-    }
-    private setListItemsNumberMaxParam=(list:any)=>{
-        const perPageInput:any =  document.getElementById('per_page')
-        if(perPageInput) {
-            let len:number = list.length
-            perPageInput.setAttribute('max', len)
-            if(this.store.getState('per_page')>len){
-                perPageInput.value = len
-            }else{
-                perPageInput.value = this.store.getState('per_page')
-            }
-        }
-    }
-    private categoriesSearch =(list:any)=>{
-        const searchString = this.store.getState('search_string')
-        /*
-           strip slashas
-            */
-        list.forEach((item:any, key:number) => {
-            item.name = item.name.replace(/(<([^>]+)>)/gi, "")
-            item.heading = item.heading.replace(/(<([^>]+)>)/gi, "")
-        })
-        if(searchString){
-            const pattern = new RegExp(searchString)
-            list = list.filter((val:any)=>{
-                 return pattern.test(val.heading)||pattern.test(val.name)
-            })
-            list.forEach((item:any, key:number) => {
-                list[key].name =  item.name.replace(searchString, `<span class="finded">${searchString}</span>`)
-                list[key].heading =  item.heading.replace(searchString, `<span class="finded">${searchString}</span>`)
-            })
-        }
-        return list;
-    }
-
-
     paginationRender(builder:PaginationBuilderInterface, list:any[]):string {
-        const data = this.store.getAllState()
-        const lastPage = Math.ceil(list.length / data.per_page)
-            const objectToBuilder = {
-                start_page : 1,
-                current_page : +data.current_page,
-                last_page : +lastPage,
-                buttons_num : lastPage<3? lastPage:3
-            }
-            if (objectToBuilder.current_page == objectToBuilder.last_page) { /*if last page*/
-                if(objectToBuilder.last_page>2) {
-                    objectToBuilder.start_page = objectToBuilder.current_page - 2
-                    objectToBuilder.buttons_num = objectToBuilder.last_page
-                }else if(objectToBuilder.last_page == 2){
-                    objectToBuilder.start_page = objectToBuilder.current_page - 1
-                    objectToBuilder.buttons_num = objectToBuilder.last_page
-                } else{
-                    objectToBuilder.buttons_num = 0
-                }
-            } else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {
-                objectToBuilder.start_page = objectToBuilder.current_page - 1
-                objectToBuilder.buttons_num = objectToBuilder.current_page+1
-            } else {
-                objectToBuilder.start_page = 1
-            }
+       const objectToBuilder = this.pagination.paginationRender(list)
             return  builder.build(objectToBuilder)
 
     }

@@ -26,7 +26,9 @@ class Categories extends Model
 
     }
     public function getAllCategories(){
-       return $this->all();
+       return \DB::select(\DB::raw("SELECT *,
+              (SELECT count(id) FROM categories_texts WHERE category_id = categories.id GROUP BY category_id ) AS text_field_num FROM
+              categories"));
     }
 
     //

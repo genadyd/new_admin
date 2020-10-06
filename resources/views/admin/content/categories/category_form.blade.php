@@ -1,7 +1,7 @@
 
 <section id="category_form_container" class="pb-5">
     <div class="d-flex justify-content-end">
-    <button type="button" class="btn btn-outline" id="list_open_close_button"><small>categories list</small></button>
+    <button type="button" class="btn btn-outline mt-2" id="list_open_close_button"><small>categories list</small></button>
     </div>
     <form id="category_form">
         <div class="category_data">

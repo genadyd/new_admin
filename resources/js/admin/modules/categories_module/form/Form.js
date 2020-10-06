@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var FormFieldsValidator_1 = __importDefault(require("../../../lib/FormFieldsValidator"));
+var FormFieldsValidator_1 = __importDefault(require("../../../lib/form_validator/FormFieldsValidator"));
 var CategoriesApi_1 = __importDefault(require("../../../api/CategoriesApi"));
 var Form = /** @class */ (function () {
     function Form() {
