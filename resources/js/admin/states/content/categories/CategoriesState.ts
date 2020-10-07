@@ -11,4 +11,6 @@ class CategoriesState extends AbstractState implements StatesInterface{
         search_string:''
     }
 }
-export default CategoriesState
+const categoryStateObj = new CategoriesState()
+
+export default categoryStateObj

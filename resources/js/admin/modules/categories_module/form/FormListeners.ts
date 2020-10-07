@@ -1,9 +1,11 @@
 import TextField from "./TextField";
-import Form from "./Form";
+import FormController from "./FormController";
+// import FormController from "./FormController";
+
 
 class FormListeners {
     private textField:any
-    private formController = new Form()
+    private formController = new FormController()
     constructor(){
         this.textField = new TextField()
         this.formController.validatorInit()
@@ -16,14 +18,14 @@ class FormListeners {
      add =()=>{
         const button = document.getElementById('category_form_submit')
         if(!button)return;
-        button.addEventListener('click',(e)=>{
+        button.addEventListener('click',()=>{
             this.formController.formSubmit()
         })
     }
     addTextField =()=>{
         const button = document.getElementById('add_text_field')
         if(!button)return;
-        button.addEventListener('click',(e)=>{
+        button.addEventListener('click',()=>{
             this.textField.addTextFieldFormElement()
 
         })

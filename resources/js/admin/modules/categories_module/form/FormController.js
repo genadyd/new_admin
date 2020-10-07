@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var FormFieldsValidator_1 = __importDefault(require("../../../lib/form_validator/FormFieldsValidator"));
 var CategoriesApi_1 = __importDefault(require("../../../api/CategoriesApi"));
-var Form = /** @class */ (function () {
-    function Form() {
+var ListController_1 = __importDefault(require("../list/ListController"));
+var FormController = /** @class */ (function () {
+    function FormController() {
         var _this = this;
         this.validator = new FormFieldsValidator_1.default();
         this.form = document.getElementById('category_form');
+        this.listController = new ListController_1.default();
         this.submitButtonEnableDisable = function (validArray) {
             var submitButton = document.getElementById('category_form_submit');
             var res = validArray.find(function (item) { return !item.is_valid; });
@@ -91,15 +93,18 @@ var Form = /** @class */ (function () {
             //validator ======================
             if (!validArray.includes(false)) {
                 var token = document.querySelector('[name=csrf-token]');
+                var categoryDataObject = _this.collectCategoryData(formElements);
+                var textFieldsObject = _this.getTextFieldsElements();
                 var formData = {
-                    categoryDataObject: _this.collectCategoryData(formElements),
-                    textFieldsObject: _this.getTextFieldsElements(),
+                    categoryDataObject: categoryDataObject,
+                    textFieldsObject: textFieldsObject,
                     'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
                 };
                 var Api = new CategoriesApi_1.default('/admin/categories/add_category', 'POST', { formData: JSON.stringify(formData) });
                 var promise = Api.exeq();
                 promise.then(function (data) {
-                    if (typeof data == 'number') {
+                    if (data.success == 1) {
+                        _this.listController.addNewCategoryToList(data.category);
                         _this.clearForm();
                         var radioButton = document.getElementById('list_open_close');
                         if (!radioButton)
@@ -123,10 +128,11 @@ var Form = /** @class */ (function () {
         this.checkIfTextFieldDataIsEmpty = function (textFieldObject) {
             var objVal = Object.values(textFieldObject);
             var checkArray = objVal.map(function (val) { return val == '' || val == ' '; });
-            if (checkArray.some(function (e) { return e === true; })) {
-                return true;
-            }
-            return false;
+            // if (checkArray.some(e => e === true)) {
+            //     return true
+            // }
+            // return false
+            return checkArray.some(function (e) { return e === true; });
         };
         this.clearForm = function () {
             var form = document.getElementById('category_form');
@@ -158,6 +164,6 @@ var Form = /** @class */ (function () {
             }
         };
     }
-    return Form;
+    return FormController;
 }());
-exports.default = Form;
+exports.default = FormController;

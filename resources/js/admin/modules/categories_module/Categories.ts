@@ -1,7 +1,10 @@
-import Form from './form/Form'
+// import Form from './form/Form'
 
     class Categories {
-       // private catForm:Form = new Form()
+       private categoryFormListener:any
+       private categoryListListener:any
+       private formController:any
+       private listController:any
         constructor(){
            // this.catForm.validatorInit()
         }

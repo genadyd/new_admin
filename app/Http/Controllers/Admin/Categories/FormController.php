@@ -23,7 +23,8 @@ class FormController extends BaseDataController
        $post_fields_data = $post_data->textFieldsObject;
        $cat_id = $this->saveCategoryData($category_data);
        $this->saveCategoryTextField($post_fields_data, $cat_id);
-    echo $cat_id;
+       $new_category_data =  $this->model->getCategoryByid($cat_id)[0] ;
+       echo json_encode(array('category'=>$new_category_data, 'success'=>1));
    }
    private function saveCategoryData($category_data){
        return $this->model->categoryDataSave($category_data);

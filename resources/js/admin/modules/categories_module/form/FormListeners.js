@@ -4,16 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var TextField_1 = __importDefault(require("./TextField"));
-var Form_1 = __importDefault(require("./Form"));
+var FormController_1 = __importDefault(require("./FormController"));
+// import FormController from "./FormController";
 var FormListeners = /** @class */ (function () {
     function FormListeners() {
         var _this = this;
-        this.formController = new Form_1.default();
+        this.formController = new FormController_1.default();
         this.add = function () {
             var button = document.getElementById('category_form_submit');
             if (!button)
                 return;
-            button.addEventListener('click', function (e) {
+            button.addEventListener('click', function () {
                 _this.formController.formSubmit();
             });
         };
@@ -21,7 +22,7 @@ var FormListeners = /** @class */ (function () {
             var button = document.getElementById('add_text_field');
             if (!button)
                 return;
-            button.addEventListener('click', function (e) {
+            button.addEventListener('click', function () {
                 _this.textField.addTextFieldFormElement();
             });
         };

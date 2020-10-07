@@ -486,10 +486,10 @@ exports["default"] = CategoriesPagination;
 
 /***/ }),
 
-/***/ "./resources/js/admin/modules/categories_module/form/Form.js":
-/*!*******************************************************************!*\
-  !*** ./resources/js/admin/modules/categories_module/form/Form.js ***!
-  \*******************************************************************/
+/***/ "./resources/js/admin/modules/categories_module/form/FormController.js":
+/*!*****************************************************************************!*\
+  !*** ./resources/js/admin/modules/categories_module/form/FormController.js ***!
+  \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -524,14 +524,17 @@ var FormFieldsValidator_1 = __importDefault(__webpack_require__(/*! ../../../lib
 
 var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../../api/CategoriesApi */ "./resources/js/admin/api/CategoriesApi.js"));
 
-var Form =
+var ListController_1 = __importDefault(__webpack_require__(/*! ../list/ListController */ "./resources/js/admin/modules/categories_module/list/ListController.js"));
+
+var FormController =
 /** @class */
 function () {
-  function Form() {
+  function FormController() {
     var _this = this;
 
     this.validator = new FormFieldsValidator_1["default"]();
     this.form = document.getElementById('category_form');
+    this.listController = new ListController_1["default"]();
 
     this.submitButtonEnableDisable = function (validArray) {
       var submitButton = document.getElementById('category_form_submit');
@@ -626,9 +629,14 @@ function () {
 
       if (!validArray.includes(false)) {
         var token = document.querySelector('[name=csrf-token]');
+
+        var categoryDataObject = _this.collectCategoryData(formElements);
+
+        var textFieldsObject = _this.getTextFieldsElements();
+
         var formData = {
-          categoryDataObject: _this.collectCategoryData(formElements),
-          textFieldsObject: _this.getTextFieldsElements(),
+          categoryDataObject: categoryDataObject,
+          textFieldsObject: textFieldsObject,
           'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
         };
         var Api = new CategoriesApi_1["default"]('/admin/categories/add_category', 'POST', {
@@ -636,7 +644,9 @@ function () {
         });
         var promise = Api.exeq();
         promise.then(function (data) {
-          if (typeof data == 'number') {
+          if (data.success == 1) {
+            _this.listController.addNewCategoryToList(data.category);
+
             _this.clearForm();
 
             var radioButton = document.getElementById('list_open_close');
@@ -668,15 +678,14 @@ function () {
       var objVal = Object.values(textFieldObject);
       var checkArray = objVal.map(function (val) {
         return val == '' || val == ' ';
-      });
+      }); // if (checkArray.some(e => e === true)) {
+      //     return true
+      // }
+      // return false
 
-      if (checkArray.some(function (e) {
+      return checkArray.some(function (e) {
         return e === true;
-      })) {
-        return true;
-      }
-
-      return false;
+      });
     };
 
     this.clearForm = function () {
@@ -716,10 +725,10 @@ function () {
     };
   }
 
-  return Form;
+  return FormController;
 }();
 
-exports["default"] = Form;
+exports["default"] = FormController;
 
 /***/ }),
 
@@ -745,7 +754,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var TextField_1 = __importDefault(__webpack_require__(/*! ./TextField */ "./resources/js/admin/modules/categories_module/form/TextField.js"));
 
-var Form_1 = __importDefault(__webpack_require__(/*! ./Form */ "./resources/js/admin/modules/categories_module/form/Form.js"));
+var FormController_1 = __importDefault(__webpack_require__(/*! ./FormController */ "./resources/js/admin/modules/categories_module/form/FormController.js")); // import FormController from "./FormController";
+
 
 var FormListeners =
 /** @class */
@@ -753,12 +763,12 @@ function () {
   function FormListeners() {
     var _this = this;
 
-    this.formController = new Form_1["default"]();
+    this.formController = new FormController_1["default"]();
 
     this.add = function () {
       var button = document.getElementById('category_form_submit');
       if (!button) return;
-      button.addEventListener('click', function (e) {
+      button.addEventListener('click', function () {
         _this.formController.formSubmit();
       });
     };
@@ -766,7 +776,7 @@ function () {
     this.addTextField = function () {
       var button = document.getElementById('add_text_field');
       if (!button) return;
-      button.addEventListener('click', function (e) {
+      button.addEventListener('click', function () {
         _this.textField.addTextFieldFormElement();
       });
     };
@@ -1006,7 +1016,7 @@ function () {
   function ListController() {
     var _this = this;
 
-    this.store = new CategoriesState_1["default"]();
+    this.store = CategoriesState_1["default"];
 
     this.getAllList = function () {
       var token = document.querySelector('[name=csrf-token]');
@@ -1081,6 +1091,14 @@ function () {
     var inputValue = target.value;
     this.store.setState('search_string', inputValue);
     this.regularPage(1);
+  };
+
+  ListController.prototype.addNewCategoryToList = function (categoryObject) {
+    var categories = this.store.getState('categories');
+    categoryObject['is_new'] = true;
+    categories.push(categoryObject);
+    var lastPage = Math.ceil(categories.length / +this.store.getState('per_page'));
+    this.regularPage(lastPage);
   };
 
   return ListController;
@@ -1294,9 +1312,11 @@ function () {
 
   RegularListBuilder.prototype.builder = function (item, key) {
     if (item.text_field_num == null) item.text_field_num = 0;
-    var deleted = '';
-    if (item.deleted_at) deleted = 'deleted';
-    return '<tr class="' + deleted + '">' + '<td scope="row">' + key + '</td>' + '<td>' + item.id + '</td>' + '<td>' + item.name + '</td>' + '<td>' + item.heading + '</td>' + '<td><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls">controls</td>' + '</tr>';
+    var deleted = '',
+        is_new = '';
+    if (item.deleted_at) deleted = ' deleted';
+    if (item.is_new) is_new = ' new';
+    return '<tr class="one_cat' + deleted + '' + is_new + '" data-id="' + item.id + '">' + '<td scope="row">' + key + '</td>' + '<td>' + item.id + '</td>' + '<td>' + item.name + '</td>' + '<td>' + item.heading + '</td>' + '<td><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls d-flex justify-content-between align-items-center">' + '<span class="material-icons">create</span>' + '<span class="material-icons">delete</span>' + '<span class="material-icons">create</span>' + '<span class="material-icons">info</span>' + '</td>' + '</tr>';
   };
 
   return RegularListBuilder;
@@ -1580,7 +1600,8 @@ function (_super) {
   return CategoriesState;
 }(AbstractState_1["default"]);
 
-exports["default"] = CategoriesState;
+var categoryStateObj = new CategoriesState();
+exports["default"] = categoryStateObj;
 
 /***/ }),
 

@@ -7,11 +7,32 @@
                 &.deleted{
                     background: $orange-dark;
                     color:#fff;
+                    td.cat_controls{
+                        .material-icons{
+                            line-height: 1;
+                            color: #fff;
+                        }
+                    }
+                }
+                &.new{
+                    background-color: #128fce;
+                    color: #fff;
+                    td.cat_controls{
+                        .material-icons{
+                            line-height: 1;
+                            color: #fff;
+                        }
+                    }
                 }
                 td {
                     .finded {
                         background-color: $orange-color;
                         color: #fff
+                    }
+                    &.cat_controls{
+                        .material-icons{
+                            line-height: 1;
+                        }
                     }
                 }
             }

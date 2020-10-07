@@ -111,9 +111,28 @@
   color: #fff;
 }
 
+#content_container #categories_list_container table tbody tr.deleted td.cat_controls .material-icons {
+  line-height: 1;
+  color: #fff;
+}
+
+#content_container #categories_list_container table tbody tr.new {
+  background-color: #128fce;
+  color: #fff;
+}
+
+#content_container #categories_list_container table tbody tr.new td.cat_controls .material-icons {
+  line-height: 1;
+  color: #fff;
+}
+
 #content_container #categories_list_container table tbody tr td .finded {
   background-color: #ED7117;
   color: #fff;
+}
+
+#content_container #categories_list_container table tbody tr td.cat_controls .material-icons {
+  line-height: 1;
 }
 
 #content_container #categories_list_container .pagination .current {

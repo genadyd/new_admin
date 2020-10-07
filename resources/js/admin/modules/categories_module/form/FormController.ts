@@ -1,10 +1,13 @@
 import FormFieldsValidator from "../../../lib/form_validator/FormFieldsValidator";
 import CategoriesApi from "../../../api/CategoriesApi";
+import ListController from "../list/ListController";
 
 
-class Form {
+class FormController {
     private validator = new FormFieldsValidator()
     private form = document.getElementById('category_form')
+    private listController = new ListController()
+
 
     submitButtonEnableDisable = (validArray: Array<object>) => {
         const submitButton = document.getElementById('category_form_submit')
@@ -88,15 +91,18 @@ class Form {
         //validator ======================
         if (!validArray.includes(false)) {
             const token = document.querySelector('[name=csrf-token]')
+            const categoryDataObject = this.collectCategoryData(formElements)
+            const textFieldsObject = this.getTextFieldsElements()
             const formData = {
-                categoryDataObject: this.collectCategoryData(formElements),
-                textFieldsObject: this.getTextFieldsElements(),
+                categoryDataObject: categoryDataObject,
+                textFieldsObject: textFieldsObject,
                 'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
             }
             const Api = new CategoriesApi('/admin/categories/add_category', 'POST', {formData: JSON.stringify(formData)})
             const promise: any = Api.exeq()
             promise.then((data: any) => {
-               if(typeof data == 'number'){
+               if( data.success == 1){
+                   this.listController.addNewCategoryToList(data.category)
                   this.clearForm()
                    const radioButton:any = document.getElementById('list_open_close')
                    if(!radioButton)return
@@ -121,10 +127,11 @@ class Form {
 
         const checkArray = objVal.map(val => val == '' || val == ' ')
 
-        if (checkArray.some(e => e === true)) {
-            return true
-        }
-        return false
+        // if (checkArray.some(e => e === true)) {
+        //     return true
+        // }
+        // return false
+        return checkArray.some(e => e === true)
 
     }
     private clearForm = ()=>{
@@ -160,5 +167,5 @@ class Form {
 
 }
 
-export default Form
+export default FormController
 
