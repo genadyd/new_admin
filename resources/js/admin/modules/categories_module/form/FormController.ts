@@ -1,6 +1,6 @@
 import FormFieldsValidator from "../../../lib/form_validator/FormFieldsValidator";
 import CategoriesApi from "../../../api/CategoriesApi";
-import ListController from "../list/ListController";
+import ListController from "../list/controllers/ListController";
 
 
 class FormController {

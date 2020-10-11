@@ -1,4 +1,6 @@
+
 <div id="header_back"></div>
+
 <nav id="main_navbar" class="navbar fixed-top">
     <div class="nav_bar_inner d-flex row vw-100">
 {{--        left navbar side --}}

@@ -2,6 +2,7 @@
 
 namespace App\Models\Admin\Categories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -24,4 +25,7 @@ class CategoriesText extends Model
        $this->insert($data_array);
         return $id_s_arr;
     }
+public function teextFieldDeleteByCatId($id){
+        DB::table($this->table)->where('category_id',$id)->update(['deleted_at'=>Carbon::now()]);
+}
 }

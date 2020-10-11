@@ -1,8 +1,8 @@
-import ListController from "./ListController";
+import ListController from "../controllers/ListController";
 
 class ListListeners {
     private listContainer = document.getElementById('categories_list_container')
-    private listController = new ListController()
+    private listController:ListControllerInterface = new ListController()
 
     constructor() {
         this.getList()
@@ -14,13 +14,15 @@ class ListListeners {
         this.formOpenClose()
         this.categoriesSearch()
     }
-    getList=()=>{
-       this.listController.getAllList()
+
+    private getList = () => {
+        if(typeof this.listController.getAllList ==='function')
+        this.listController.getAllList()
     }
-/*
-* pagination exequte
-* */
-    pageSwitch = (): void => {
+    /*
+    * pagination exequte
+    * */
+    private pageSwitch = (): void => {
         if (this.listContainer) {
             this.listContainer.addEventListener('click', (e: any) => {
                 let targ = e.target
@@ -34,8 +36,8 @@ class ListListeners {
                             let pageNum = targ.getAttribute('page_num')
 
                             this.listController.regularPage(pageNum)
-                        }catch (error){
-                             console.error('Expected attrribute "page_num" in target Button')
+                        } catch (error) {
+                            console.error('Expected attrribute "page_num" in target Button')
                         }
 
                     }
@@ -47,12 +49,14 @@ class ListListeners {
     /*
     * sorting by date
     * */
-    sortByDate = () => {
+    private sortByDate = () => {
         if (this.listContainer) {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #sort_by_date')
             if (sortByDateInput) {
                 sortByDateInput.addEventListener('click', () => {
-                    this.listController.sortByDate()
+                    if(typeof this.listController.sortByDate ==='function') {
+                        this.listController.sortByDate()
+                    }
                 })
             }
 
@@ -61,12 +65,14 @@ class ListListeners {
     /*
     * show hide deleted items
     * */
-    includeDeleted = () => {
+    private includeDeleted = () => {
         if (this.listContainer) {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #include_deleted')
             if (sortByDateInput) {
                 sortByDateInput.addEventListener('click', () => {
-                    this.listController.includeDeleted()
+                    if(typeof this.listController.includeDeleted ==='function') {
+                        this.listController.includeDeleted()
+                    }
                 })
             }
 
@@ -75,14 +81,16 @@ class ListListeners {
     /*
     * only deleted ****************
     * */
-    onlyDeleted = () => {
+    private onlyDeleted = () => {
         if (this.listContainer) {
             const sortByDateInput = this.listContainer.querySelector('#categories_control_panel #just_deleted')
             if (sortByDateInput) {
                 sortByDateInput.addEventListener('click', (e) => {
-                    const checkBox:any = e.target
-                    if(checkBox) {
+                    const checkBox: any = e.target
+                    if (checkBox) {
+                        if(typeof this.listController.onlyDeleted ==='function') {
                             this.listController.onlyDeleted()
+                        }
                     }
                 })
             }
@@ -92,36 +100,50 @@ class ListListeners {
     /*
     * change per page num
     * */
-    changePerPageNum(){
+    private changePerPageNum() {
         const perPageInput = document.getElementById('per_page')
-        if(perPageInput){
-            perPageInput.oninput = (e:any)=>{
-                this.listController.changePerPageNum(e)
+        if (perPageInput) {
+            perPageInput.oninput = (e: any) => {
+                if(typeof this.listController.changePerPageNum ==='function') {
+                    this.listController.changePerPageNum(e)
+                }
+
             }
         }
     }
+
     /*
     * form open close
     * */
-    formOpenClose(){
+    private formOpenClose() {
         const addNewButton = document.getElementById('add_new_category_form_open')
-        if(addNewButton) {
+        if (addNewButton) {
             addNewButton.onclick = (() => {
-                this.listController.formOpenClose()
+                if(typeof this.listController.formOpenClose ==='function') {
+                    this.listController.formOpenClose()
+                }
+
             })
         }
     }
+
     /*
     *
     * search by name or heading ============
     * */
-    categoriesSearch(){
+    private categoriesSearch() {
         const searchInput = document.getElementById('categories_search_input')
-        if(searchInput){
-            searchInput.oninput = (e)=>{
-                this.listController.searchInput(e)
+        if (searchInput) {
+            searchInput.oninput = (e) => {
+                if(typeof this.listController.searchInput ==='function') {
+                    this.listController.searchInput(e)
+                }
+
             }
         }
     }
+
+
 }
+
 export default ListListeners

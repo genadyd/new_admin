@@ -6,7 +6,7 @@
         <th scope="col">name</th>
         <th scope="col">heading</th>
         <th scope="col">textfields</th>
-        <th scope="col">controls</th>
+        <th scope="col" class="text-center">controls</th>
     </tr>
     </thead>
     <tbody>

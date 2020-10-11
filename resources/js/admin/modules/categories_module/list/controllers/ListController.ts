@@ -1,15 +1,15 @@
-import RegularRender from "./list_render/RegularRender";
-import RegularListBuilder from "./html_list_builder/RegularListBuilder";
-import CategoriesApi from "../../../api/CategoriesApi";
-import CategoriesStateObj from "../../../states/content/categories/CategoriesState";
+import RegularRender from "../list_render/RegularRender";
+import RegularListBuilder from "../html_list_builder/RegularListBuilder";
+import CategoriesApi from "../../../../api/CategoriesApi";
+import CategoriesStateObj from "../../../../states/content/categories/CategoriesState";
+import AbstractListController from "./AbstractListController";
 
-class ListController {
-    private store = CategoriesStateObj
+class ListController extends AbstractListController implements ListControllerInterface{
+
     public getAllList = () => {
-        const token = document.querySelector('[name=csrf-token]')
         const formData = {
             action: {},
-            'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+            'X-CSRF-TOKEN': this.token ? this.token.getAttribute('content') : ''
         }
         const Api = new CategoriesApi('/admin/categories/get_list', 'POST', {formData: JSON.stringify(formData)})
         const promise: any = Api.exeq()
@@ -23,22 +23,19 @@ class ListController {
             }
         )
     }
-    public regularPage = (curentPage: number) => {
-        this.store.setState('current_page', curentPage)
-        const render = new RegularRender(this.store)
-        render.listRender(new RegularListBuilder())
-    }
+
 
     public sortByDate = () => {
-        this.store.setState('sort_by_date_desc',
-            !this.store.getState('sort_by_date_desc'))
-        this.regularPage(1)
+        this.store.setState('sort_by_date_desc', !this.store.getState('sort_by_date_desc'))
+        const curentPage = this.store.getState('current_page')
+        this.regularPage(curentPage)
     }
 
     public includeDeleted = (): void => {
         this.store.setState('include_deleted',
             !this.store.getState('include_deleted'))
-        this.regularPage(1)
+        const curentPage = this.store.getState('current_page')
+        this.regularPage(curentPage)
 
     }
 
@@ -49,13 +46,15 @@ class ListController {
         }
         this.store.setState('only_deleted',
             !this.store.getState('only_deleted'))
-        this.regularPage(1)
+        const curentPage = this.store.getState('current_page')
+        this.regularPage(curentPage)
     }
 
     public changePerPageNum(event: any) {
         let newVal = event.target.value
         this.store.setState('per_page', +newVal)
-        this.regularPage(1)
+        const curentPage = this.store.getState('current_page')
+        this.regularPage(curentPage)
     }
 
     public formOpenClose() {
@@ -80,6 +79,7 @@ class ListController {
 
         this.regularPage(lastPage)
     }
+
 }
 
 export default ListController

@@ -2,6 +2,8 @@
 
 namespace App\Models\Admin\Categories;
 
+use Carbon\Carbon;
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 
@@ -26,14 +28,21 @@ class Categories extends Model
 
     }
     public function getAllCategories(){
-       return \DB::select(\DB::raw("SELECT *,
+       return DB::select(DB::raw("SELECT *,
               (SELECT count(id) FROM categories_texts WHERE category_id = categories.id GROUP BY category_id ) AS text_field_num FROM
               categories"));
     }
     public function getCategoryByid($cat_id){
-        return \DB::select(\DB::raw("SELECT *,
+        return DB::select(DB::raw("SELECT *,
               (SELECT count(id) FROM categories_texts WHERE category_id = categories.id GROUP BY category_id ) AS text_field_num FROM
               categories WHERE id={$cat_id}"));
+    }
+    public function categoryDelete($id):array{
+      $now = Carbon::now();
+      $res=array();
+      $res[] = DB::table('categories')->where('id', $id)->update(['deleted_at'=>$now]);
+      $res[] = $now;
+      return $res;
     }
 
     //

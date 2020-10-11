@@ -37,17 +37,25 @@ var RegularRender = /** @class */ (function () {
        * */
     RegularRender.prototype.listRender = function (builder) {
         var categoriesList = this.store.getState('categories');
-        var perPageNum = this.store.getState('per_page') || 0;
-        var perPage = perPageNum != 0 ? perPageNum : categoriesList.length;
-        var currentPage = this.store.getState('current_page');
-        var offset = currentPage * perPage - (perPage - 1);
-        var limit = currentPage * perPage;
-        var listHtml = '';
         categoriesList = this.pagination.searchItems(categoriesList);
         categoriesList = this.pagination.includeDeleted(categoriesList);
         categoriesList = this.pagination.sortByData(categoriesList);
         categoriesList = this.pagination.onlyDeleted(categoriesList);
-        categoriesList = this.pagination.includeDeleted(categoriesList);
+        var perPageNum = this.store.getState('per_page') || 0;
+        var perPage = perPageNum != 0 ? perPageNum : categoriesList.length;
+        var currentPage = this.store.getState('current_page');
+        var lastPage = Math.ceil(categoriesList.length / perPage);
+        if (currentPage > lastPage) {
+            this.store.setState('current_page', lastPage);
+            currentPage = lastPage;
+        }
+        var offset = currentPage * perPage - (perPage - 1);
+        var limit = currentPage * perPage;
+        var listHtml = '';
+        // categoriesList = this.pagination.searchItems(categoriesList)
+        // categoriesList = this.pagination.includeDeleted(categoriesList)
+        // categoriesList = this.pagination.sortByData(categoriesList)
+        // categoriesList = this.pagination.onlyDeleted(categoriesList)
         this.pagination.setListItemsNumberMaxParam(__spreadArrays(categoriesList));
         categoriesList.forEach(function (item, key) {
             if (key >= (offset - 1) && key <= limit - 1) {

@@ -1,12 +1,17 @@
 #categories_list_container{
     display: none;
+    .modal{
+        z-index: 99999;
+    }
     table{
         font-size: 14px;
         tbody{
             tr {
+                border-top: 1px solid #dee2e6;
                 &.deleted{
                     background: $orange-dark;
                     color:#fff;
+
                     td.cat_controls{
                         .material-icons{
                             line-height: 1;
@@ -25,14 +30,24 @@
                     }
                 }
                 td {
+                    border-top:none;
                     .finded {
                         background-color: $orange-color;
-                        color: #fff
+                        color: #fff;
+
                     }
                     &.cat_controls{
+                        button{
+                            line-height: 1;
+                            border: none;
+                            outline:none !important;
+                            box-shadow:none;
+                        }
                         .material-icons{
                             line-height: 1;
+                            cursor: pointer;
                         }
+
                     }
                 }
             }

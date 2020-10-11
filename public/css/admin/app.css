@@ -2,6 +2,10 @@ body {
   font-family: Lato, sans-serif;
 }
 
+body .modal-backdrop {
+  z-index: 9999;
+}
+
 body .material-icons {
   line-height: inherit;
   color: #636b6f;

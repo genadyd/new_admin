@@ -29,16 +29,14 @@ abstract class AbstractPagination implements PagitationInterface{
     }
     searchItems(list:any){
         const searchString = this.store.getState('search_string')
-        /*
-           strip slashas
-            */
 
+        /* strip slashas */
         list.forEach((item:any) => {
             item.name = item.name.replace(/(<([^>]+)>)/gi, "")
             item.heading = item.heading.replace(/(<([^>]+)>)/gi, "")
         })
         if(searchString){
-            const pattern = new RegExp(searchString)
+            const pattern = new RegExp((searchString), "g")
             list = list.filter((val:any)=>{
                 return pattern.test(val.heading)||pattern.test(val.name)
             })

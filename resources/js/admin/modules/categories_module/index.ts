@@ -1,6 +1,7 @@
 
 import FormListeners from "./form/FormListeners";
-import ListListeners from "./list/ListListeners";
+import ListListeners from "./list/list_listeners/ListListeners";
+import ListControlsListeners from "./list/list_listeners/ListControlsListeners";
 
 /*
 *  Categories form ==========================
@@ -10,8 +11,9 @@ import ListListeners from "./list/ListListeners";
 CKEDITOR.replace('ckeditor_text',{
     customConfig: '../ckeditor/custom_config.js'
 })
-const f = new FormListeners()
-const l = new ListListeners()
+new FormListeners()
+new ListListeners()
+new ListControlsListeners()
 
 
 

@@ -102,8 +102,16 @@
   display: none;
 }
 
+#content_container #categories_list_container .modal {
+  z-index: 99999;
+}
+
 #content_container #categories_list_container table {
   font-size: 14px;
+}
+
+#content_container #categories_list_container table tbody tr {
+  border-top: 1px solid #dee2e6;
 }
 
 #content_container #categories_list_container table tbody tr.deleted {
@@ -126,13 +134,25 @@
   color: #fff;
 }
 
+#content_container #categories_list_container table tbody tr td {
+  border-top: none;
+}
+
 #content_container #categories_list_container table tbody tr td .finded {
   background-color: #ED7117;
   color: #fff;
 }
 
+#content_container #categories_list_container table tbody tr td.cat_controls button {
+  line-height: 1;
+  border: none;
+  outline: none !important;
+  box-shadow: none;
+}
+
 #content_container #categories_list_container table tbody tr td.cat_controls .material-icons {
   line-height: 1;
+  cursor: pointer;
 }
 
 #content_container #categories_list_container .pagination .current {

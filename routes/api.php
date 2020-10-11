@@ -21,6 +21,7 @@ Route::prefix('admin')->namespace('Admin')->middleware('web')->group(function ($
     Route::post('/get_submenu', 'GeMenuController@getSubmenuJson');
     Route::post('/categories/add_category', 'Categories\FormController@getData');
     Route::post('/categories/get_list', 'Categories\ListController@getList');
+    Route::post('/categories/category_delete', 'Categories\ListController@categoryDelete');
     Route::post('/categories/get_text_field', function (){
         return view('admin.content.categories.text_field');
     });

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var FormFieldsValidator_1 = __importDefault(require("../../../lib/form_validator/FormFieldsValidator"));
 var CategoriesApi_1 = __importDefault(require("../../../api/CategoriesApi"));
-var ListController_1 = __importDefault(require("../list/ListController"));
+var ListController_1 = __importDefault(require("../list/controllers/ListController"));
 var FormController = /** @class */ (function () {
     function FormController() {
         var _this = this;
