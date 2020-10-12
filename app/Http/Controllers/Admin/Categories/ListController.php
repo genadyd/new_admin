@@ -37,4 +37,21 @@ class ListController extends BaseDataController
        }
        return json_encode($delete_res);
    }
+   public function categoryRestore(Request $request){
+       $post_data = json_decode($request->input('formData'));
+       $restore_res = $this->model->categoryRestore( $post_data->id );
+       if($restore_res === 1){
+           $this->text_field_model->textFieldDeletedRestore($post_data->id);
+       }
+       return json_encode($restore_res);
+
+   }
+   public function getCategoryDataById(Request $request){
+       $post_data = json_decode($request->input('formData'));
+       $category_data = $this->model->getCategoryDataById((int)$post_data->id);
+       if($category_data){
+           $category_data->text_fields = $this->text_field_model->getTextFieldsDataByCategoryId($post_data->id);
+       }
+       return json_encode($category_data);
+}
 }

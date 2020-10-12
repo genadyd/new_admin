@@ -25,7 +25,13 @@ class CategoriesText extends Model
        $this->insert($data_array);
         return $id_s_arr;
     }
-public function teextFieldDeleteByCatId($id){
+public function teextFieldDeleteByCatId(int $id){
         DB::table($this->table)->where('category_id',$id)->update(['deleted_at'=>Carbon::now()]);
+}
+public function textFieldDeletedRestore(int $id){
+    DB::table($this->table)->where('category_id',$id)->update(['deleted_at'=>null]);
+}
+public function getTextFieldsDataByCategoryId(int $id){
+   return DB::table($this->table)->where('category_id',$id)->where('deleted_at',null)->get();
 }
 }

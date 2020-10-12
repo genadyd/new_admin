@@ -1,7 +1,7 @@
 
 import FormListeners from "./form/FormListeners";
-import ListListeners from "./list/list_listeners/ListListeners";
-import ListControlsListeners from "./list/list_listeners/ListControlsListeners";
+import ListListeners from "./list/listeners/list_listeners/ListListeners";
+import ListControlsListeners from "./list/listeners/list_listeners/ListControlsListeners";
 
 /*
 *  Categories form ==========================

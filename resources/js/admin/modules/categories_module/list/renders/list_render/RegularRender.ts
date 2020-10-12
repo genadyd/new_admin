@@ -1,6 +1,6 @@
-import RegularPaginationBuilder from "../html_pagination_builder/RegularPaginationBuilder"
-import CategoriesPagination from "../../../../lib/list_pagination/content/categories/CategoriesPagination";
-import PagitationInterface from "../../../../lib/list_pagination/PagitationInterface";
+import RegularPaginationBuilder from "../../html_builders/html_pagination_builder/RegularPaginationBuilder"
+import CategoriesPagination from "../../../../../lib/list_pagination/content/categories/CategoriesPagination";
+import PagitationInterface from "../../../../../lib/list_pagination/PagitationInterface";
 
 
 class RegularRender implements ListRenderInterface {
@@ -36,10 +36,6 @@ class RegularRender implements ListRenderInterface {
 
         let listHtml: any = ''
 
-        // categoriesList = this.pagination.searchItems(categoriesList)
-        // categoriesList = this.pagination.includeDeleted(categoriesList)
-        // categoriesList = this.pagination.sortByData(categoriesList)
-        // categoriesList = this.pagination.onlyDeleted(categoriesList)
         this.pagination.setListItemsNumberMaxParam([...categoriesList])
 
         categoriesList.forEach((item: any, key: number) => {
@@ -69,7 +65,6 @@ class RegularRender implements ListRenderInterface {
     paginationRender(builder: PaginationBuilderInterface, list: any[]): string {
         const objectToBuilder = this.pagination.paginationRender(list)
         return builder.build(objectToBuilder)
-
     }
 
     paginationAppend(paginationHtml: string) {

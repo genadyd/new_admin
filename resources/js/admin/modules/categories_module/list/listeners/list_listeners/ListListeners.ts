@@ -1,4 +1,4 @@
-import ListController from "../controllers/ListController";
+import ListController from "../../controllers/ListController";
 
 class ListListeners {
     private listContainer = document.getElementById('categories_list_container')

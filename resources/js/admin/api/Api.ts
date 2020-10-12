@@ -17,13 +17,10 @@ abstract class Api {
           urlPrefix = '/api'
        }
        const type = this.type==='json'?'application/json':'text/html'
-       // const _token = this.data['X-CSRF-TOKEN']
-       // this.data['X-CSRF-TOKEN'] = undefined
         return fetch(urlPrefix + this.url,{
             method:this.method,
              headers:{
                  'Content-Type': type,
-                 // 'X-CSRF-TOKEN':_token
              },
             body:this.data =='undefined'?'':JSON.stringify(this.data)
         }).then(response => {

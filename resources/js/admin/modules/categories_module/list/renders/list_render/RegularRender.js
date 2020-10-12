@@ -10,8 +10,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RegularPaginationBuilder_1 = __importDefault(require("../html_pagination_builder/RegularPaginationBuilder"));
-var CategoriesPagination_1 = __importDefault(require("../../../../lib/list_pagination/content/categories/CategoriesPagination"));
+var RegularPaginationBuilder_1 = __importDefault(require("../../html_builders/html_pagination_builder/RegularPaginationBuilder"));
+var CategoriesPagination_1 = __importDefault(require("../../../../../lib/list_pagination/content/categories/CategoriesPagination"));
 var RegularRender = /** @class */ (function () {
     function RegularRender(store) {
         var _this = this;
@@ -52,10 +52,6 @@ var RegularRender = /** @class */ (function () {
         var offset = currentPage * perPage - (perPage - 1);
         var limit = currentPage * perPage;
         var listHtml = '';
-        // categoriesList = this.pagination.searchItems(categoriesList)
-        // categoriesList = this.pagination.includeDeleted(categoriesList)
-        // categoriesList = this.pagination.sortByData(categoriesList)
-        // categoriesList = this.pagination.onlyDeleted(categoriesList)
         this.pagination.setListItemsNumberMaxParam(__spreadArrays(categoriesList));
         categoriesList.forEach(function (item, key) {
             if (key >= (offset - 1) && key <= limit - 1) {

@@ -148,6 +148,7 @@
   border: none;
   outline: none !important;
   box-shadow: none;
+  background-color: transparent;
 }
 
 #content_container #categories_list_container table tbody tr td.cat_controls .material-icons {

@@ -1,5 +1,5 @@
-import RegularRender from "../list_render/RegularRender";
-import RegularListBuilder from "../html_list_builder/RegularListBuilder";
+import RegularRender from "../renders/list_render/RegularRender";
+import RegularListBuilder from "../html_builders/html_list_builder/RegularListBuilder";
 import CategoriesApi from "../../../../api/CategoriesApi";
 import CategoriesStateObj from "../../../../states/content/categories/CategoriesState";
 import AbstractListController from "./AbstractListController";

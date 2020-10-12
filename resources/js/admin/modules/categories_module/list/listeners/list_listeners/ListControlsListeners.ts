@@ -1,14 +1,18 @@
-import AbstractListController from "../controllers/AbstractListController";
-import ListControlsController from "../controllers/ListControlsController";
+import AbstractListController from "../../controllers/AbstractListController";
+import ListControlsController from "../../controllers/ListControlsController";
+import InfoModalController from "../../modals_controllers/InfoModalController";
 
 class ListControlsListeners{
     private listContainer:HTMLElement|null = document.getElementById('categories_list_container')
     private listController = new ListControlsController()
+    private modalController = new InfoModalController()
     constructor() {
 
         this.categoryDeleteButtonOnclick()
         this.modalCloseWithoutSave()
         this.categoryDeleteConfirm()
+        this.categoryRestory()
+        this.showInfo()
     }
     private categoryDeleteButtonOnclick() {
         if (this.listContainer) {
@@ -16,9 +20,6 @@ class ListControlsListeners{
             this.listContainer.addEventListener('click', (e: any) => {
                 const target = e.target
                 if (target && (target.classList.contains('category_delete_button') || target.matches('span.material-icons.delete'))) {
-                    cont.querySelectorAll('tr.ready_to_delete').forEach((i) => {
-                        i.classList.remove('ready_to_delete')
-                    })
                     target.closest('tr').classList.add('ready_to_delete')
                 }
             })
@@ -54,6 +55,34 @@ class ListControlsListeners{
                     if(closeButton) closeButton.click()
                 }
             }
+        }
+    }
+    categoryRestory(){
+        if (this.listContainer) {
+            const cont = this.listContainer
+            this.listContainer.addEventListener('click', (e: any) => {
+                const target = e.target
+                if (target && (target.classList.contains('category_restore_button') || target.matches('span.material-icons.restore'))) {
+                    this.listController.categoryRestory(+target.closest('tr').dataset.id)
+                }
+            })
+        }
+    }
+    showInfo(){
+        if (this.listContainer) {
+            const cont = this.listContainer
+            this.listContainer.addEventListener('click', (e: any) => {
+                const target = e.target
+                if (target && (target.classList.contains('category_info_button') || target.matches('span.material-icons.info'))) {
+                    if (cont) {
+                        cont.querySelectorAll('tr.info_processing').forEach((i) => {
+                            i.classList.remove('info_processing')
+                        })
+                    }
+                    this.modalController.getCategoryData(target.closest('tr').dataset.id)
+                    target.closest('tr').classList.add('info_processing')
+                }
+            })
         }
     }
 }

@@ -10,9 +10,11 @@ class RegularListBuilder implements ListBuilderInterface{
                 '<td>' + item.heading + '</td>' +
                 '<td><span class="badge badge-pill badge-primary">'+item.text_field_num+'</span></td>' +
                 '<td class="cat_controls d-flex justify-content-around align-items-center">' +
+                '<button type="button" class="category_info_button" data-toggle="modal" data-target="#categoryInfoModal">' +
                 '<span class="material-icons info">info</span>' +
+                '</button>' +
                 '<span class="material-icons edit">create</span>' +
-                '<button type="button" class="category_restore_button btn p-0" data-toggle="modal" data-target="#categoryDeleteModal">' +
+                '<button type="button" class="category_restore_button btn p-0" >' +
                 ' <span class="material-icons restore" title="restore">restore</span>' +
                 '</button>' +
                 '</td>' +
@@ -26,7 +28,9 @@ class RegularListBuilder implements ListBuilderInterface{
             '<td>' + item.heading + '</td>' +
             '<td><span class="badge badge-pill badge-primary">'+item.text_field_num+'</span></td>' +
             '<td class="cat_controls d-flex justify-content-around align-items-center">' +
+            '<button type="button" class="category_info_button" data-toggle="modal" data-target="#categoryInfoModal">' +
             '<span class="material-icons info">info</span>' +
+            '</button>' +
             '<span class="material-icons edit">create</span>' +
             '<button type="button" class="category_delete_button btn p-0" data-toggle="modal" data-target="#categoryDeleteModal">' +
             ' <span class="material-icons delete" title="delete">delete</span>' +
