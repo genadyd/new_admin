@@ -1,10 +1,10 @@
-<div class="modal fade" id="categoryInfoModal" tabindex="-1" role="dialog" aria-labelledby="categoryInfoModalTitle"
+<div class="modal fade bd-example-modal-lg" id="categoryInfoModal" tabindex="-1" role="dialog" aria-labelledby="categoryInfoModalTitle"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="categoryInfoModalTitle">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="categoryInfoModalName">Modal title</h5>
+                <button type="button" class="close close_button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -17,24 +17,29 @@
                     <li class="list-group-item deleted_time d-flex justify-content-between align-items-center"><span>Deleted:</span><span
                             class="date"></span></li>
                 </ul>
+                <hr>
                 <div class="modal_data_container">
                     <div class="title mt-2">
-                        <span>Title:</span>
+                        <span class="font-weight-bold">Title:</span>
                         <span class="text ml-2"></span>
                     </div>
+                    <hr>
                     <div class="heading mt-2">
-                        <span>Heading:</span>
+                        <span class="font-weight-bold">Heading:</span>
                         <span class="text ml-2"></span>
                     </div>
+                    <hr>
                     <div class="description mt-2">
-                        <span>Description:</span>
+                        <span class="font-weight-bold">Description:</span>
                         <p class="text ml-2"></p>
                     </div>
                 </div>
             </div>
+            <div class="modal_texts_fields_area">
+
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-{{--                <button type="button" class="btn btn-primary">Save changes</button>--}}
+                <button type="button" class="btn btn-secondary close_button" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

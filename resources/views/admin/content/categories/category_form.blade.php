@@ -1,10 +1,10 @@
 
-<section id="category_form_container" class="pb-5">
+<section id="category_form_container" class="form_container pb-5">
     <div class="d-flex justify-content-end">
     <button type="button" class="btn btn-outline mt-2" id="list_open_close_button"><small>categories list</small></button>
     </div>
-    <form id="category_form">
-        <div class="category_data">
+    <form id="category_form" class="entity_form">
+        <div class="category_data entity_data">
             <div class="form-row">
                 <div class="col-lg-6 col-12 mt-3 input_block">
                     <label for="category_name">Name</label>
@@ -52,7 +52,7 @@
         </div>
     </form>
     <div class="button_area mt-3 d-flex justify-content-between">
-        <button id="category_form_submit" class="btn" type="button" disabled>Submit</button>
+        <button id="category_form_submit" class="btn add_form_submit" type="button" disabled>Submit</button>
         <button id="add_text_field" class="btn btn-outline-warning" type="button">Add Text Field</button>
     </div>
 </section>

@@ -1,8 +1,8 @@
-<div class="delete_category_modal modal fade" id="categoryDeleteModal" tabindex="-1" role="dialog" aria-labelledby="categoryDeleteModalLabel" aria-hidden="true">
+<div class="delete_category_modal modal fade" id="itemDeleteModal" tabindex="-1" role="dialog" aria-labelledby="itemDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="categoryDeleteModalLabel">Delete Category</h5>
+                <h5 class="modal-title" id="itemDeleteModalLabel">Delete Category</h5>
                 <button type="button" class="close modal_close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

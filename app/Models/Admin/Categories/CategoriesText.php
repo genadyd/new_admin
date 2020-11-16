@@ -25,6 +25,9 @@ class CategoriesText extends Model
        $this->insert($data_array);
         return $id_s_arr;
     }
+public function getAllTextsFields(){
+    return DB::table($this->table)->orderBy('category_id')->get();
+}
 public function teextFieldDeleteByCatId(int $id){
         DB::table($this->table)->where('category_id',$id)->update(['deleted_at'=>Carbon::now()]);
 }

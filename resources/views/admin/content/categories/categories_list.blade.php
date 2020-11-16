@@ -1,4 +1,4 @@
-<section id="categories_list_container">
+<section id="categories_list_container" class="items_list_container">
         @include('admin.content.categories.category_delete_modal')
         @include('admin.content.categories.category_info_modal')
         @include('admin.content.categories.categories_list_control_panel')

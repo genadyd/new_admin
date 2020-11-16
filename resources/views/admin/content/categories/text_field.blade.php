@@ -1,4 +1,4 @@
-<div class="form_row my-3 categories_text_field">
+<div class="form_row my-3 categories_text_field entity_text_field ">
     <div class="head d-flex justify-content-between align-items-center">
         <div class="left_box "><span class="num"></span></div>
         <div class="controls d-flex justify-content-end">

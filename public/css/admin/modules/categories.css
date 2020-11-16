@@ -110,8 +110,15 @@
   font-size: 14px;
 }
 
+#content_container #categories_list_container table thead th .sort_icon {
+  color: #ED7117;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
 #content_container #categories_list_container table tbody tr {
   border-top: 1px solid #dee2e6;
+  position: relative;
 }
 
 #content_container #categories_list_container table tbody tr.deleted {
@@ -141,6 +148,23 @@
 #content_container #categories_list_container table tbody tr td .finded {
   background-color: #ED7117;
   color: #fff;
+}
+
+#content_container #categories_list_container table tbody tr td.item_num {
+  width: 3%;
+}
+
+#content_container #categories_list_container table tbody tr td.item_id {
+  width: 5%;
+  text-align: center;
+}
+
+#content_container #categories_list_container table tbody tr td.item_name {
+  width: 25%;
+}
+
+#content_container #categories_list_container table tbody tr td.item_heading {
+  width: 35%;
 }
 
 #content_container #categories_list_container table tbody tr td.cat_controls button {

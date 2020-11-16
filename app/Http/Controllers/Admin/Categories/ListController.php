@@ -25,10 +25,26 @@ class ListController extends BaseDataController
         $this->model = new Categories();
         $this->text_field_model = new CategoriesText();
     }
+/*
+ * @getList --- getting all categories for init state
+ * */
+    public function getList()
+    {
+        $categories_list = $this->model->getAllCategories();
+        $texts_fields = $this->text_field_model->getAllTextsFields();
+        foreach ($categories_list as $key => $val) {
+            if (!isset($val->text_fields)) {
+                $categories_list[$key]->text_fields = array();
+            }
+            foreach ($texts_fields as $tv) {
+                if ($tv->category_id === $val->id) {
+                    array_push($categories_list[$key]->text_fields, $tv);
+                }
+            }
+        }
+        echo json_encode($categories_list);
+    }
 
-    public function getList(){
-        return json_encode($this->model->getAllCategories());
-   }
    public function categoryDelete(Request $request){
        $post_data = json_decode($request->input('formData'));
        $delete_res = $this->model->categoryDelete($post_data->id);

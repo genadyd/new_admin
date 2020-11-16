@@ -5,13 +5,22 @@
     }
     table{
         font-size: 14px;
+        thead{
+           th{
+              .sort_icon{
+                  color: $orange-color;
+                  margin-left: 5px;
+                  cursor: pointer;
+              }
+           }
+        }
         tbody{
             tr {
                 border-top: 1px solid #dee2e6;
+                position: relative;
                 &.deleted{
                     background: $orange-dark;
                     color:#fff;
-
                     td.cat_controls{
                         .material-icons{
                             line-height: 1;
@@ -36,6 +45,21 @@
                         color: #fff;
 
                     }
+                    &.item_num{
+                        width: 3%;
+                    }
+                    &.item_id{
+                        width: 5%;
+                        text-align: center;
+                    }
+                    &.item_name{
+                        width: 25%;
+                    }
+                    &.item_heading{
+                        width: 35%;
+                    }
+
+
                     &.cat_controls{
                         button{
                             line-height: 1;

@@ -1,24 +1,27 @@
 
-import FormListeners from "./form/FormListeners";
-import ListListeners from "./list/listeners/list_listeners/ListListeners";
-import ListControlsListeners from "./list/listeners/list_listeners/ListControlsListeners";
+import ListController from "./ListController";
+import FormController from "./FormController";
+import ListControlsController from "./ListControlsController";
+import FormControllersInterface from "../../app/controllers/forms_controllers/FormControllersInterface";
+import ListControllerInterface from "../../app/controllers/list_controllers/ListControllerInterface";
+import ListControlsControllerInterface
+    from "../../app/controllers/list_controllers/list_controls_controller/ListControlsControllerInterface";
+import CategoriesController from "./CategoriesController";
 
-/*
-*  Categories form ==========================
-*
-* */
+
 // @ts-ignore
 CKEDITOR.replace('ckeditor_text',{
     customConfig: '../ckeditor/custom_config.js'
 })
-new FormListeners()
-new ListListeners()
-new ListControlsListeners()
+const formController:any = new CategoriesController()
+// const listControlsController:ListControlsControllerInterface = new ListControlsController()
+//
+// const listController:ListControllerInterface = new ListController()
+// listController.getControlsController(listControlsController)
+// listControlsController.setListRender(listController.renderList)
+//
+// formController.getListController(listController)
 
 
 
-
-/*
-* Categories form end ===========================================================
-* */
 
