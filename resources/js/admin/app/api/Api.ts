@@ -24,10 +24,7 @@ abstract class Api {
              },
             body:this.data =='undefined'?'':JSON.stringify(this.data)
         }).then(response => {
-            if(this.type === 'json') {
-             return    response.json()
-            }
-            return response.text()
+             return  this.type === 'json'?  response.json() : response.text()
         })
    }
 }
