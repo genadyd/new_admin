@@ -49,15 +49,27 @@ class InfoModalController implements ModalControllerInterface{
         const descriptionArea = this.modalContainer.querySelector('.modal_data_container .description .text')
         if(descriptionArea) descriptionArea.innerHTML= modalData.description
         this.renderTextFields(modalData.text_fields)
-
     }
-    private renderTextFields(modalDataTextFields:any){
-       let html = modalDataTextFields.reduce((acc:any,item:any)=>{
-           return acc+=`<div class="title_heading text_field_heading font-weight-bold">Title:</div><div class="text_title_area">${item.title}</div>`+
-                      `<div class="description_heading text_field_heading font-weight-bold">Description:</div><div class="text_field_description_area">${item.description}</div>`+
-                      `<div class="text_heading text_field_heading font-weight-bold">Text:</div><div class="text_field_text">${item.text}</div>`
+    private renderTextFields(modalDataTextFields:any):void|boolean{
+        const textFieldsArea:any = this.modalContainer.querySelector('.modal_texts_fields_area')
+        if(modalDataTextFields.length === 0) {
+            textFieldsArea.innerHTML = ''
+            return false
+        }
+
+        let heading = `<h5 class="font-weight-bold">Text fields:</h5><hr/>`
+        let html = modalDataTextFields.reduce((acc:any,item:any)=>{
+           return acc+=`<div class="one_text p-1">
+                      <div class="title_heading text_field_heading font-weight-bold">Title:</div>
+                        <div class="text_title_area">${item.title}</div><hr/>`+
+                      `<div class="description_heading text_field_heading font-weight-bold">Description:</div>
+                        <div class="text_field_description_area">${item.description}</div><hr/>`+
+                      `<div class="text_heading text_field_heading font-weight-bold">Text:</div>
+                        <div class="text_field_text">${item.text}</div></div>`
         },'')
-        this.modalContainer.querySelector('.modal_texts_fields_area').innerHTML = html
+        if(textFieldsArea) {
+            textFieldsArea.innerHTML = heading + html
+        }
     }
     confirmModal(){
 

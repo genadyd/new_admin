@@ -7,12 +7,20 @@
         font-size: 14px;
         thead{
            th{
+               //padding: .75rem 2px;
               .sort_icon{
                   color: $orange-color;
-                  margin-left: 5px;
+                  margin-left: 0px;
                   cursor: pointer;
               }
+               &.item_id_heading{
+                   text-align: center;
+               }
            }
+            .controls_th{
+                width: 10%;
+
+            }
         }
         tbody{
             tr {

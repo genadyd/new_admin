@@ -112,8 +112,16 @@
 
 #content_container #categories_list_container table thead th .sort_icon {
   color: #ED7117;
-  margin-left: 5px;
+  margin-left: 0px;
   cursor: pointer;
+}
+
+#content_container #categories_list_container table thead th.item_id_heading {
+  text-align: center;
+}
+
+#content_container #categories_list_container table thead .controls_th {
+  width: 10%;
 }
 
 #content_container #categories_list_container table tbody tr {

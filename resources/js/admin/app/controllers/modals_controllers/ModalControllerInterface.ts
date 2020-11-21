@@ -1,5 +1,6 @@
 interface ModalControllerInterface{
     closeModal():void
     renderModal(modalData:any):void
-    confirmModal():void
+    confirmModal(renderFunc?:any):void
+    setListRenderFunction?(func:any):void
 }

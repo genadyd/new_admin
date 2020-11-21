@@ -176,11 +176,7 @@ function () {
         },
         body: _this.data == 'undefined' ? '' : JSON.stringify(_this.data)
       }).then(function (response) {
-        if (_this.type === 'json') {
-          return response.json();
-        }
-
-        return response.text();
+        return _this.type === 'json' ? response.json() : response.text();
       });
     };
 
@@ -836,6 +832,10 @@ function () {
   };
 
   AbstractListControlsController.prototype.itemDelete = function () {
+    var _this = this;
+
+    this.deleteModal.closeModal();
+
     if (this.listContainer) {
       this.listContainer.addEventListener('click', function (e) {
         var target = e.target;
@@ -857,30 +857,11 @@ function () {
 
             if (closestTr) {
               closestTr.classList.add('ready_to_delete');
+
+              _this.deleteModal.confirmModal(_this.listRenderFunction);
             }
           }
         }
-      });
-    }
-  };
-
-  AbstractListControlsController.prototype.deleteModalCloseWithoutSave = function () {
-    var table = document.querySelector('.items_list_container .table');
-    var buttons = document.querySelectorAll('#itemDeleteModal .modal_close');
-
-    if (buttons) {
-      buttons.forEach(function (button) {
-        button.addEventListener('click', function () {
-          if (table) {
-            var readyToDelete = table.querySelectorAll('tbody tr.ready_to_delete');
-
-            if (readyToDelete.length > 0) {
-              readyToDelete.forEach(function (item) {
-                item.classList.remove('ready_to_delete');
-              });
-            }
-          }
-        });
       });
     }
   };
@@ -1732,6 +1713,8 @@ var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../app/api/Cate
 
 var InfoModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/InfoModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/InfoModalController.js"));
 
+var DeleteModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/DeleteModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js"));
+
 var ListControlsController =
 /** @class */
 function (_super) {
@@ -1741,74 +1724,60 @@ function (_super) {
     var _this = _super.call(this, stateManager) || this;
 
     _this.infoModalController = new InfoModalController_1["default"]();
+    _this.deleteModal = new DeleteModalController_1["default"](_this.stateManager);
 
     _this.itemInfo();
 
     _this.itemDelete();
 
-    _this.deleteModalCloseWithoutSave();
-
-    _this.deleteConfirm();
+    _this.itemRestore();
 
     return _this;
   }
 
-  ListControlsController.prototype.deleteConfirm = function () {
+  ListControlsController.prototype.itemUpdate = function () {
+    var container = document.querySelector('#content_container');
+    if (!container) return;
+    container.addEventListener('click', function (e) {});
+  };
+
+  ListControlsController.prototype.itemRestore = function () {
     var _this = this;
 
-    var button = document.querySelector('#itemDeleteModal .modal_confirm');
+    var container = document.querySelector('#content_container');
+    if (!container) return;
+    container.addEventListener('click', function (e) {
+      var target = e.target;
 
-    if (button) {
-      button.addEventListener('click', function () {
-        var readySelectionElement = document.querySelector('.items_list_container tbody tr.ready_to_delete');
-        if (!readySelectionElement) return;
-        var itemId = readySelectionElement.dataset.id;
+      if (target && target.classList.contains('restore')) {
+        var id_1 = target.closest('tr').dataset.id;
+        var key = +target.closest('tr').dataset.key;
         var formData = {
-          id: itemId,
+          action: {},
+          id: id_1,
           'X-CSRF-TOKEN': _this.token ? _this.token : ''
         };
-        var Api = new CategoriesApi_1["default"]('/admin/categories/category_delete', 'POST', {
+        var Api = new CategoriesApi_1["default"]('/admin/categories/category_restore', 'POST', {
           formData: JSON.stringify(formData)
         });
         var promise = Api.exeq();
         promise.then(function (res) {
-          if (res[0] == 1) {
-            var list = _this.list.getState('list');
+          if (res === 1) {
+            _this.deleteFromListById(+id_1);
 
-            var deletedIndex = list.findIndex(function (item) {
-              return item.id === +itemId;
-            });
-
-            var currentPage = _this.stateManager.getState('current_page');
-
-            list[deletedIndex].deleted_at = res[1];
-
-            _this.listRenderFunction(currentPage);
+            _this.listRenderFunction();
           }
         });
-      });
-    }
+      }
+    });
   };
 
-  ListControlsController.prototype.itemUpdate = function () {};
-
-  ListControlsController.prototype.categoryRestore = function (id) {// const formData = {
-    //     action: {},
-    //     id: id,
-    //     'X-CSRF-TOKEN': this.token ? this.token.getAttribute('content') : ''
-    // }
-    // const Api = new CategoriesApi('/admin/categories/category_restore', 'POST', {formData: JSON.stringify(formData)})
-    // const promise: any = Api.exeq()
-    // promise.then((res: number) => {
-    //         if (res === 1) {
-    //             const deletedIndex = this.store.findIndexOfItemsByItemId('categories', id)
-    //             const currentPage = this.store.getState('current_page')
-    //             const categories = this.store.getState('categories')
-    //             categories[deletedIndex].deleted_at = null
-    //             this.regularPage(currentPage)
-    //         }
-    //     }
-    // )
+  ListControlsController.prototype.deleteFromListById = function (id) {
+    var list = this.stateManager.getState('list');
+    var elem = list.find(function (item) {
+      return item.id === id;
+    });
+    elem.deleted_at = null;
   };
 
   return ListControlsController;
@@ -1965,13 +1934,7 @@ var CategoriesController_1 = __importDefault(__webpack_require__(/*! ./Categorie
 CKEDITOR.replace('ckeditor_text', {
   customConfig: '../ckeditor/custom_config.js'
 });
-var formController = new CategoriesController_1["default"](); // const listControlsController:ListControlsControllerInterface = new ListControlsController()
-//
-// const listController:ListControllerInterface = new ListController()
-// listController.getControlsController(listControlsController)
-// listControlsController.setListRender(listController.renderList)
-//
-// formController.getListController(listController)
+new CategoriesController_1["default"]();
 
 /***/ }),
 
@@ -2002,10 +1965,10 @@ function () {
         var is_new = '';
 
         if (item.deleted_at) {
-          listHtml += '<tr class="one_cat deleted" ' + is_new + '" data-id="' + item.id + '">' + '<td class="item_num">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading">' + item.heading + '</td>' + '<td class="item_text_field_num"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-around align-items-center">' + '<button type="button" class="info_button" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit">create</span>' + '<button type="button" class="category_restore_button btn p-0" >' + ' <span class="material-icons restore" title="restore">restore</span>' + '</button>' + '</td>' + '</tr>';
+          listHtml += '<tr class="one_cat deleted" ' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_restore_button item_restore_button btn p-0 ml-1" >' + ' <span class="material-icons restore" title="restore">restore</span>' + '</button>' + '</td>' + '</tr>';
         } else {
           if (item.is_new) is_new = ' new';
-          listHtml += '<tr class="one_cat' + is_new + '" data-id="' + item.id + '">' + '<td class="item_num">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading">' + item.heading + '</td>' + '<td class="item_text_field_num"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-around align-items-center">' + '<button type="button" class="info_button" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit">create</span>' + '<button type="button" class="category_delete_button item_delete_button btn p-0" data-toggle="modal" data-target="#itemDeleteModal">' + ' <span class="material-icons delete" title="delete">delete</span>' + '</button>' + '</td>' + '</tr>';
+          listHtml += '<tr class="one_cat' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_delete_button item_delete_button btn p-0 ml-1" data-toggle="modal" data-target="#itemDeleteModal">' + ' <span class="material-icons delete" title="delete">delete</span>' + '</button>' + '</td>' + '</tr>';
         }
       }
     });
@@ -2083,6 +2046,102 @@ exports["default"] = PaginationBuilder;
 
 /***/ }),
 
+/***/ "./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js ***!
+  \**************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../../app/api/CategoriesApi */ "./resources/js/admin/app/api/CategoriesApi.js"));
+
+var DeleteModalController =
+/** @class */
+function () {
+  function DeleteModalController(stateManager) {
+    this.stateManager = stateManager;
+    var tokenElem = document.querySelector('[name=csrf-token]');
+    this.token = tokenElem ? tokenElem.getAttribute('content') : '';
+  }
+
+  DeleteModalController.prototype.closeModal = function () {
+    var table = document.querySelector('.items_list_container .table');
+    var buttons = document.querySelectorAll('#itemDeleteModal .modal_close');
+
+    if (buttons) {
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          if (table) {
+            var readyToDelete = table.querySelectorAll('tbody tr.ready_to_delete');
+
+            if (readyToDelete.length > 0) {
+              readyToDelete.forEach(function (item) {
+                item.classList.remove('ready_to_delete');
+              });
+            }
+          }
+        });
+      });
+    }
+  };
+
+  DeleteModalController.prototype.confirmModal = function (renderFunc) {
+    var _this = this;
+
+    var button = document.querySelector('#itemDeleteModal .modal_confirm');
+
+    if (button) {
+      button.addEventListener('click', function () {
+        var readySelectionElement = document.querySelector('.items_list_container tbody tr.ready_to_delete');
+        if (!readySelectionElement) return;
+        var itemId = readySelectionElement.dataset.id;
+        var formData = {
+          id: itemId,
+          'X-CSRF-TOKEN': _this.token ? _this.token : ''
+        };
+        var Api = new CategoriesApi_1["default"]('/admin/categories/category_delete', 'POST', {
+          formData: JSON.stringify(formData)
+        });
+        var promise = Api.exeq();
+        promise.then(function (res) {
+          if (res[0] == 1) {
+            var list = _this.stateManager.getState('list');
+
+            var deletedIndex = list.findIndex(function (item) {
+              return item.id === +itemId;
+            });
+            list[deletedIndex].deleted_at = res[1];
+            renderFunc();
+            var button_1 = document.querySelector('#itemDeleteModal .modal_close');
+            if (button_1) button_1.click();
+          }
+        });
+      });
+    }
+  };
+
+  DeleteModalController.prototype.renderModal = function (modalData) {};
+
+  return DeleteModalController;
+}();
+
+exports["default"] = DeleteModalController;
+
+/***/ }),
+
 /***/ "./resources/js/admin/modules/categories_module/modals_controllers/InfoModalController.js":
 /*!************************************************************************************************!*\
   !*** ./resources/js/admin/modules/categories_module/modals_controllers/InfoModalController.js ***!
@@ -2147,6 +2206,25 @@ function () {
 
     var descriptionArea = this.modalContainer.querySelector('.modal_data_container .description .text');
     if (descriptionArea) descriptionArea.innerHTML = modalData.description;
+    this.renderTextFields(modalData.text_fields);
+  };
+
+  InfoModalController.prototype.renderTextFields = function (modalDataTextFields) {
+    var textFieldsArea = this.modalContainer.querySelector('.modal_texts_fields_area');
+
+    if (modalDataTextFields.length === 0) {
+      textFieldsArea.innerHTML = '';
+      return false;
+    }
+
+    var heading = "<h5 class=\"font-weight-bold\">Text fields:</h5><hr/>";
+    var html = modalDataTextFields.reduce(function (acc, item) {
+      return acc += "<div class=\"one_text p-1\">\n                      <div class=\"title_heading text_field_heading font-weight-bold\">Title:</div>\n                        <div class=\"text_title_area\">" + item.title + "</div><hr/>" + ("<div class=\"description_heading text_field_heading font-weight-bold\">Description:</div>\n                        <div class=\"text_field_description_area\">" + item.description + "</div><hr/>") + ("<div class=\"text_heading text_field_heading font-weight-bold\">Text:</div>\n                        <div class=\"text_field_text\">" + item.text + "</div></div>");
+    }, '');
+
+    if (textFieldsArea) {
+      textFieldsArea.innerHTML = heading + html;
+    }
   };
 
   InfoModalController.prototype.confirmModal = function () {};

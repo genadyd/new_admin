@@ -1,4 +1,5 @@
 import ListControlsControllerInterface from "./ListControlsControllerInterface";
+import DeleteModalController from "../../../../modules/categories_module/modals_controllers/DeleteModalController";
 
 abstract class AbstractListControlsController implements ListControlsControllerInterface {
     protected list: any
@@ -7,10 +8,12 @@ abstract class AbstractListControlsController implements ListControlsControllerI
     protected stateManager: any
     protected token: string
     protected abstract infoModalController:ModalControllerInterface
+    protected abstract deleteModal:ModalControllerInterface
 
     protected constructor(stateManager: any) {
         this.stateManager = stateManager
         this.token = this.getToken()
+
     }
 
     protected getToken(): any {
@@ -23,6 +26,7 @@ abstract class AbstractListControlsController implements ListControlsControllerI
     }
 
     public itemDelete(): void {
+        this.deleteModal.closeModal()
         if (this.listContainer) {
             this.listContainer.addEventListener('click', (e: any) => {
                 const target = e.target
@@ -42,6 +46,9 @@ abstract class AbstractListControlsController implements ListControlsControllerI
                         let closestTr = target.closest('tr')
                         if (closestTr) {
                             closestTr.classList.add('ready_to_delete')
+
+                            this.deleteModal.confirmModal(this.listRenderFunction)
+
                         }
                     }
                 }
@@ -49,26 +56,7 @@ abstract class AbstractListControlsController implements ListControlsControllerI
         }
     }
 
-    protected deleteModalCloseWithoutSave() {
-        const table = document.querySelector('.items_list_container .table')
-        const buttons: any = document.querySelectorAll('#itemDeleteModal .modal_close')
-        if (buttons) {
-            buttons.forEach((button: any) => {
-                button.addEventListener('click', () => {
-                    if (table) {
-                        let readyToDelete: any = table.querySelectorAll('tbody tr.ready_to_delete')
-                        if (readyToDelete.length > 0) {
-                            readyToDelete.forEach(
-                                (item: any) => {
-                                    item.classList.remove('ready_to_delete')
-                                }
-                            )
-                        }
-                    }
-                })
-            })
-        }
-    }
+
 
     protected getItemById(id: number) {
         const list = this.stateManager.getState('list')

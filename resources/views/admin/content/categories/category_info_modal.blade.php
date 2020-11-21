@@ -34,10 +34,12 @@
                         <p class="text ml-2"></p>
                     </div>
                 </div>
-            </div>
-            <div class="modal_texts_fields_area">
+                <hr/>
+                <div class="modal_texts_fields_area mx-2">
 
+                </div>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary close_button" data-dismiss="modal">Close</button>
             </div>

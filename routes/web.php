@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', 'admin');
 
-Route::namespace('Admin')->prefix('admin')->group(function () {
+Route::namespace('Admin')->prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/', 'DashboardController@show');
 //    content =====================================
     Route::namespace('Admin')->get('content/pages', 'PagesController@show')->name('pages_settings');

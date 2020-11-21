@@ -4,70 +4,59 @@ import CategoriesApi from "../../app/api/CategoriesApi";
 import ListControlsControllerInterface
     from "../../app/controllers/list_controllers/list_controls_controller/ListControlsControllerInterface";
 import InfoModalController from "./modals_controllers/InfoModalController";
+import DeleteModalController from "./modals_controllers/DeleteModalController";
 
 class ListControlsController extends AbstractListControlsController implements ListControlsControllerInterface{
      protected infoModalController:ModalControllerInterface
+     protected deleteModal:ModalControllerInterface
     constructor(stateManager:any) {
         super(stateManager);
         this.infoModalController = new InfoModalController()
+        this.deleteModal = new DeleteModalController(this.stateManager)
         this.itemInfo()
         this.itemDelete()
-        this.deleteModalCloseWithoutSave()
-        this.deleteConfirm()
+        this.itemRestore()
+
     }
 
-
-    deleteConfirm(){
-        const button = document.querySelector('#itemDeleteModal .modal_confirm')
-        if (button) {
-            button.addEventListener('click', () => {
-                const readySelectionElement:any = document.querySelector('.items_list_container tbody tr.ready_to_delete')
-                if(!readySelectionElement) return
-                const itemId = readySelectionElement.dataset.id
-                const formData = {
-                    id: itemId,
-                    'X-CSRF-TOKEN': this.token ? this.token : ''
-                }
-                const Api = new CategoriesApi('/admin/categories/category_delete', 'POST', {formData: JSON.stringify(formData)})
-                const promise: any = Api.exeq()
-                promise.then((res: any[]) => {
-                        if (res[0] == 1) {
-                            const list = this.list.getState('list')
-                            const deletedIndex = list.findIndex((item:any) =>item.id === +itemId)
-                            const currentPage = this.stateManager.getState('current_page')
-                            list[deletedIndex].deleted_at = res[1]
-                            this.listRenderFunction(currentPage)
-                        }
-                    }
-                )
-            })
-        }
-    }
 
 
     itemUpdate(): void {
+        const container = document.querySelector('#content_container')
+        if(!container) return
+        container.addEventListener('click',(e:any)=>{})
     }
 
-    public categoryRestore(id:number){
-        // const formData = {
-        //     action: {},
-        //     id: id,
-        //     'X-CSRF-TOKEN': this.token ? this.token.getAttribute('content') : ''
-        // }
-        // const Api = new CategoriesApi('/admin/categories/category_restore', 'POST', {formData: JSON.stringify(formData)})
-        // const promise: any = Api.exeq()
-        // promise.then((res: number) => {
-        //         if (res === 1) {
-        //             const deletedIndex = this.store.findIndexOfItemsByItemId('categories', id)
-        //             const currentPage = this.store.getState('current_page')
-        //             const categories = this.store.getState('categories')
-        //             categories[deletedIndex].deleted_at = null
-        //             this.regularPage(currentPage)
-        //         }
-        //     }
-        // )
+    protected itemRestore(){
+        const container = document.querySelector('#content_container')
+        if(!container) return
+        container.addEventListener('click',(e:any)=>{
+            const target = e.target
+            if(target && target.classList.contains('restore')){
+                const id = target.closest('tr').dataset.id
+                const key = +target.closest('tr').dataset.key
+                const formData = {
+                    action: {},
+                    id: id,
+                    'X-CSRF-TOKEN': this.token ? this.token : ''
+                }
+                const Api = new CategoriesApi('/admin/categories/category_restore', 'POST', {formData: JSON.stringify(formData)})
+                const promise: any = Api.exeq()
+                promise.then((res: number) => {
+                        if (res === 1) {
+                            this.deleteFromListById(+id)
+                            this.listRenderFunction()
+                        }
+                    }
+                )
+            }
+        })
     }
-
+    private deleteFromListById(id:number){
+         const list = this.stateManager.getState('list')
+        const elem = list.find((item:any)=>item.id === id)
+        elem.deleted_at = null
+    }
 }
 
 
