@@ -31,7 +31,10 @@ class ListController extends BaseDataController
     public function getList()
     {
         $categories_list = $this->model->getAllCategories();
+
         $texts_fields = $this->text_field_model->getAllTextsFields();
+        $result_array = [];
+//        dd($categories_list);
         foreach ($categories_list as $key => $val) {
             if (!isset($val->text_fields)) {
                 $categories_list[$key]->text_fields = array();
@@ -41,8 +44,11 @@ class ListController extends BaseDataController
                     array_push($categories_list[$key]->text_fields, $tv);
                 }
             }
+            $categories_list[$key]->text_field_num = count($categories_list[$key]->text_fields);
+            $result_array[] = $categories_list[$key];
         }
-        echo json_encode($categories_list);
+
+        echo json_encode($result_array);
     }
 
    public function categoryDelete(Request $request){
@@ -60,14 +66,6 @@ class ListController extends BaseDataController
            $this->text_field_model->textFieldDeletedRestore($post_data->id);
        }
        return json_encode($restore_res);
-
    }
-   public function getCategoryDataById(Request $request){
-       $post_data = json_decode($request->input('formData'));
-       $category_data = $this->model->getCategoryDataById((int)$post_data->id);
-       if($category_data){
-           $category_data->text_fields = $this->text_field_model->getTextFieldsDataByCategoryId($post_data->id);
-       }
-       return json_encode($category_data);
-}
+
 }

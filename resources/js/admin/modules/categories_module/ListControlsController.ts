@@ -5,6 +5,8 @@ import ListControlsControllerInterface
     from "../../app/controllers/list_controllers/list_controls_controller/ListControlsControllerInterface";
 import InfoModalController from "./modals_controllers/InfoModalController";
 import DeleteModalController from "./modals_controllers/DeleteModalController";
+import {itemFindFunc} from "../../lib/item_find/item_find";
+import ListBuilder from "./list/html_builders/ListBuilder";
 
 class ListControlsController extends AbstractListControlsController implements ListControlsControllerInterface{
      protected infoModalController:ModalControllerInterface
@@ -16,6 +18,8 @@ class ListControlsController extends AbstractListControlsController implements L
         this.itemInfo()
         this.itemDelete()
         this.itemRestore()
+        this.openFormForAddChildrenItem()
+        this.childrenListView()
 
     }
 
@@ -44,7 +48,9 @@ class ListControlsController extends AbstractListControlsController implements L
                 const promise: any = Api.exeq()
                 promise.then((res: number) => {
                         if (res === 1) {
-                            this.deleteFromListById(+id)
+                            const list = this.stateManager.getState('list')
+                            const elem:any =  itemFindFunc(list,+id)
+                            if(elem) elem.deleted_at = null
                             this.listRenderFunction()
                         }
                     }
@@ -52,11 +58,29 @@ class ListControlsController extends AbstractListControlsController implements L
             }
         })
     }
-    private deleteFromListById(id:number){
-         const list = this.stateManager.getState('list')
-        const elem = list.find((item:any)=>item.id === id)
-        elem.deleted_at = null
+    protected childrenListView(){
+        const table:any = document.querySelector('.items_list_container .table')
+        table.addEventListener('click',(e:any)=>{
+            const target:any = e.target
+            if(target.classList.contains('view_list')){
+                const parentId = target.closest('tr').dataset.id
+                const list  = this.stateManager.getState('list')
+                const elem:any =  itemFindFunc(list,+parentId)
+                const listBuilder = new ListBuilder()
+                const html = listBuilder.build(elem.children_list)
+                const currentElement = this.table.querySelector(`tr[data-id="${elem.id}"]`)
+                const parser = new DOMParser()
+                const res = parser.parseFromString(html, 'text/html')
+                table.insertBefore(res,currentElement.nextSiblings)
+
+            }
+
+        })
+
+
     }
+
+
 }
 
 

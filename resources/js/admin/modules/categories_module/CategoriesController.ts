@@ -53,6 +53,8 @@ class CategoriesController {
             addNewButton.onclick = () => {
                 const checkBox = document.getElementById('form_open_close')
                 if (checkBox) checkBox.checked = true
+                const form:any = document.querySelector('.form_container .entity_form')
+                form.querySelector('input.parent_id').value = 0
             }
         }
     }

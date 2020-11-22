@@ -813,11 +813,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var item_find_1 = __webpack_require__(/*! ../../../../lib/item_find/item_find */ "./resources/js/admin/lib/item_find/item_find.js");
+
 var AbstractListControlsController =
 /** @class */
 function () {
   function AbstractListControlsController(stateManager) {
     this.listContainer = document.querySelector('.items_list_container');
+    this.table = document.querySelector('.items_list_container .table');
     this.stateManager = stateManager;
     this.token = this.getToken();
   }
@@ -866,14 +869,6 @@ function () {
     }
   };
 
-  AbstractListControlsController.prototype.getItemById = function (id) {
-    var list = this.stateManager.getState('list');
-    var res = list.find(function (val) {
-      return +val.id === +id;
-    });
-    return res;
-  };
-
   AbstractListControlsController.prototype.itemInfo = function () {
     var _this = this;
 
@@ -896,12 +891,28 @@ function () {
 
           itemElement.classList.add('info_active');
 
-          var modalData = _this.getItemById(itemId);
+          var list = _this.stateManager.getState('list');
+
+          var modalData = item_find_1.itemFindFunc(list, +itemId);
 
           _this.infoModalController.renderModal(modalData);
         }
       });
     }
+  };
+
+  AbstractListControlsController.prototype.openFormForAddChildrenItem = function () {
+    this.table.addEventListener('click', function (e) {
+      var target = e.target;
+
+      if (target.classList.contains('add_into_this')) {
+        var formOpenCloseButton = document.querySelector('#add_new_form_open');
+        var parentId = target.closest('tr').dataset.id;
+        var form = document.querySelector('.form_container .entity_form');
+        formOpenCloseButton.click();
+        form.querySelector('input.parent_id').value = parentId;
+      }
+    });
   };
 
   AbstractListControlsController.prototype.itemUpdate = function () {};
@@ -1004,6 +1015,38 @@ function () {
 }();
 
 exports["default"] = FormFieldsValidator;
+
+/***/ }),
+
+/***/ "./resources/js/admin/lib/item_find/item_find.js":
+/*!*******************************************************!*\
+  !*** ./resources/js/admin/lib/item_find/item_find.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.itemFindFunc = void 0;
+
+exports.itemFindFunc = function (list, itemId) {
+  var res = 0;
+  list.forEach(function (val) {
+    if (val.id === itemId) {
+      res = val;
+      return res;
+    }
+
+    if (val.children_list && val.children_list.length > 0) {
+      return exports.itemFindFunc(val.children_list, itemId);
+    }
+  });
+  return res;
+};
 
 /***/ }),
 
@@ -1211,6 +1254,8 @@ function () {
         addNewButton.onclick = function () {
           var checkBox = document.getElementById('form_open_close');
           if (checkBox) checkBox.checked = true;
+          var form = document.querySelector('.form_container .entity_form');
+          form.querySelector('input.parent_id').value = 0;
         };
       }
     };
@@ -1426,6 +1471,8 @@ var TextFieldController_1 = __importDefault(__webpack_require__(/*! ./TextFieldC
 
 var AbstractFormController_1 = __importDefault(__webpack_require__(/*! ../../app/controllers/forms_controllers/AbstractFormController */ "./resources/js/admin/app/controllers/forms_controllers/AbstractFormController.js"));
 
+var item_find_1 = __webpack_require__(/*! ../../lib/item_find/item_find */ "./resources/js/admin/lib/item_find/item_find.js");
+
 var FormController =
 /** @class */
 function (_super) {
@@ -1477,7 +1524,13 @@ function (_super) {
             if (data.success == 1) {
               var state = __spreadArrays(_this.stateManager.getState('list'));
 
-              state.push(data.category);
+              if (data.category.parent === 0) {
+                state.push(data.category);
+              } else {
+                var elem = item_find_1.itemFindFunc(state, data.category.parent);
+                if (!elem.children_list) elem['children_list'] = [];
+                if (elem) elem.children_list.push(data.category);
+              }
 
               _this.stateManager.setState('list', state);
 
@@ -1715,6 +1768,10 @@ var InfoModalController_1 = __importDefault(__webpack_require__(/*! ./modals_con
 
 var DeleteModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/DeleteModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js"));
 
+var item_find_1 = __webpack_require__(/*! ../../lib/item_find/item_find */ "./resources/js/admin/lib/item_find/item_find.js");
+
+var ListBuilder_1 = __importDefault(__webpack_require__(/*! ./list/html_builders/ListBuilder */ "./resources/js/admin/modules/categories_module/list/html_builders/ListBuilder.js"));
+
 var ListControlsController =
 /** @class */
 function (_super) {
@@ -1731,6 +1788,10 @@ function (_super) {
     _this.itemDelete();
 
     _this.itemRestore();
+
+    _this.openFormForAddChildrenItem();
+
+    _this.childrenListView();
 
     return _this;
   }
@@ -1763,7 +1824,10 @@ function (_super) {
         var promise = Api.exeq();
         promise.then(function (res) {
           if (res === 1) {
-            _this.deleteFromListById(+id_1);
+            var list = _this.stateManager.getState('list');
+
+            var elem = item_find_1.itemFindFunc(list, +id_1);
+            if (elem) elem.deleted_at = null;
 
             _this.listRenderFunction();
           }
@@ -1772,12 +1836,29 @@ function (_super) {
     });
   };
 
-  ListControlsController.prototype.deleteFromListById = function (id) {
-    var list = this.stateManager.getState('list');
-    var elem = list.find(function (item) {
-      return item.id === id;
+  ListControlsController.prototype.childrenListView = function () {
+    var _this = this;
+
+    var table = document.querySelector('.items_list_container .table');
+    table.addEventListener('click', function (e) {
+      var target = e.target;
+
+      if (target.classList.contains('view_list')) {
+        var parentId = target.closest('tr').dataset.id;
+
+        var list = _this.stateManager.getState('list');
+
+        var elem = item_find_1.itemFindFunc(list, +parentId);
+        var listBuilder = new ListBuilder_1["default"]();
+        var html = listBuilder.build(elem.children_list);
+
+        var currentElement = _this.table.querySelector("tr[data-id=\"" + elem.id + "\"]");
+
+        var parser = new DOMParser();
+        var res = parser.parseFromString(html, 'text/html');
+        table.insertBefore(res, currentElement.nextSiblings);
+      }
     });
-    elem.deleted_at = null;
   };
 
   return ListControlsController;
@@ -1958,20 +2039,39 @@ function () {
   function ListBuilder() {}
 
   ListBuilder.prototype.build = function (list) {
+    var _this = this;
+
     var listHtml = '';
     list.forEach(function (item, key) {
-      if (item.to_render) {
-        if (item.text_field_num == null) item.text_field_num = 0;
-        var is_new = '';
-
-        if (item.deleted_at) {
-          listHtml += '<tr class="one_cat deleted" ' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_restore_button item_restore_button btn p-0 ml-1" >' + ' <span class="material-icons restore" title="restore">restore</span>' + '</button>' + '</td>' + '</tr>';
-        } else {
-          if (item.is_new) is_new = ' new';
-          listHtml += '<tr class="one_cat' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_delete_button item_delete_button btn p-0 ml-1" data-toggle="modal" data-target="#itemDeleteModal">' + ' <span class="material-icons delete" title="delete">delete</span>' + '</button>' + '</td>' + '</tr>';
-        }
-      }
+      listHtml += _this.listHtmlBuild(item, key);
     });
+    return listHtml;
+  };
+
+  ListBuilder.prototype.listHtmlBuild = function (item, key) {
+    var listHtml = '';
+    if (item.text_field_num == null) item.text_field_num = 0;
+    var is_new = '';
+
+    if (item.deleted_at) {
+      listHtml += '<tr class="one_cat deleted" ' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<span title="add into" class="material-icons add_into_this">add</span>';
+
+      if (item.children_list && item.children_list.length > 0) {
+        listHtml += '<span title="list view" class="material-icons view_list">view_list</span>';
+      }
+
+      listHtml += '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_restore_button item_restore_button btn p-0 ml-1" >' + ' <span class="material-icons restore" title="restore">restore</span>' + '</button>' + '</td>' + '</tr>';
+    } else {
+      if (item.is_new) is_new = ' new';
+      listHtml += '<tr class="one_cat' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<span title="add into" class="material-icons add_into_this">add</span>';
+
+      if (item.children_list && item.children_list.length > 0) {
+        listHtml += '<span title="list view" class="material-icons view_list">view_list</span>';
+      }
+
+      listHtml += '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_delete_button item_delete_button btn p-0 ml-1" data-toggle="modal" data-target="#itemDeleteModal">' + ' <span class="material-icons delete" title="delete">delete</span>' + '</button>' + '</td>' + '</tr>';
+    }
+
     return listHtml;
   };
 

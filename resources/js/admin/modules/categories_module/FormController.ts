@@ -2,6 +2,7 @@ import CategoriesApi from "../../app/api/CategoriesApi";
 import TextFieldController from "./TextFieldController";
 import AbstractFormController from "../../app/controllers/forms_controllers/AbstractFormController";
 import FormControllersInterface from "../../app/controllers/forms_controllers/FormControllersInterface";
+import {itemFindFunc} from "../../lib/item_find/item_find";
 
 
 class FormController extends AbstractFormController implements FormControllersInterface  {
@@ -51,8 +52,14 @@ class FormController extends AbstractFormController implements FormControllersIn
                 promise.then((data: any) => {
                     if (data.success == 1) {
                         const state = [...this.stateManager.getState('list')]
-                        state.push(data.category)
-                        this.stateManager.setState('list',state)
+                        if(data.category.parent === 0) {
+                            state.push(data.category)
+                        }else{
+                          const elem:any =  itemFindFunc( state, data.category.parent)
+                            if(!elem.children_list)elem['children_list'] = []
+                            if(elem) elem.children_list.push(data.category)
+                        }
+                        this.stateManager.setState('list', state)
                         this.clearForm()
                         const radioButton: any = document.getElementById('list_open_close')
                         if (!radioButton) return

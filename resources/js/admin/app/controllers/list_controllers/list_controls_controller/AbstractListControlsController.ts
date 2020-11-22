@@ -1,5 +1,6 @@
 import ListControlsControllerInterface from "./ListControlsControllerInterface";
 import DeleteModalController from "../../../../modules/categories_module/modals_controllers/DeleteModalController";
+import {itemFindFunc} from "../../../../lib/item_find/item_find";
 
 abstract class AbstractListControlsController implements ListControlsControllerInterface {
     protected list: any
@@ -7,10 +8,13 @@ abstract class AbstractListControlsController implements ListControlsControllerI
     protected listContainer: HTMLElement | null = document.querySelector('.items_list_container')
     protected stateManager: any
     protected token: string
+    protected table:any
     protected abstract infoModalController:ModalControllerInterface
     protected abstract deleteModal:ModalControllerInterface
+    protected abstract childrenListView?():void
 
     protected constructor(stateManager: any) {
+        this.table= document.querySelector('.items_list_container .table')
         this.stateManager = stateManager
         this.token = this.getToken()
 
@@ -46,22 +50,12 @@ abstract class AbstractListControlsController implements ListControlsControllerI
                         let closestTr = target.closest('tr')
                         if (closestTr) {
                             closestTr.classList.add('ready_to_delete')
-
                             this.deleteModal.confirmModal(this.listRenderFunction)
-
                         }
                     }
                 }
             })
         }
-    }
-
-
-
-    protected getItemById(id: number) {
-        const list = this.stateManager.getState('list')
-        let res = list.find((val: any) => +val.id === +id)
-        return res
     }
     protected itemInfo(): void {
         const table = document.querySelector('.items_list_container .table')
@@ -80,13 +74,29 @@ abstract class AbstractListControlsController implements ListControlsControllerI
                         )
                     }
                     itemElement.classList.add('info_active')
-                    const modalData: any = this.getItemById(itemId)
+                    const list  = this.stateManager.getState('list')
+                    const modalData: any = itemFindFunc(list,+itemId)
                     this.infoModalController.renderModal(modalData)
                 }
             })
-
         }
     }
+    protected openFormForAddChildrenItem(){
+            this.table.addEventListener('click',(e:any)=>{
+                const target:any = e.target
+                if(target.classList.contains('add_into_this')){
+                    const formOpenCloseButton:any = document.querySelector('#add_new_form_open')
+                    const parentId = target.closest('tr').dataset.id
+                    const form:any = document.querySelector('.form_container .entity_form')
+                    formOpenCloseButton.click();
+                    form.querySelector('input.parent_id').value = parentId
+
+                }
+            })
+    }
+
+
+
 
     itemUpdate(): void {
     }
