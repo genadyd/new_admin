@@ -2048,6 +2048,8 @@ function () {
     return listHtml;
   };
 
+  ListBuilder.prototype.listHtmlBuildNew = function (item, key) {};
+
   ListBuilder.prototype.listHtmlBuild = function (item, key) {
     var listHtml = '';
     if (item.text_field_num == null) item.text_field_num = 0;
