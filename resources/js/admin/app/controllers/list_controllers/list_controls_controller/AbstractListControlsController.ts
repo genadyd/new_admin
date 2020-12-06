@@ -1,6 +1,5 @@
 import ListControlsControllerInterface from "./ListControlsControllerInterface";
-import DeleteModalController from "../../../../modules/categories_module/modals_controllers/DeleteModalController";
-import {itemFindFunc} from "../../../../lib/item_find/item_find";
+import {itemFindById} from "../../../../lib/item_find/items_find";
 
 abstract class AbstractListControlsController implements ListControlsControllerInterface {
     protected list: any
@@ -10,7 +9,7 @@ abstract class AbstractListControlsController implements ListControlsControllerI
     protected token: string
     protected table:any
     protected abstract infoModalController:ModalControllerInterface
-    protected abstract deleteModal:ModalControllerInterface
+    // protected abstract deleteModal:ModalControllerInterface
     protected abstract childrenListView?():void
 
     protected constructor(stateManager: any) {
@@ -30,15 +29,13 @@ abstract class AbstractListControlsController implements ListControlsControllerI
     }
 
     public itemDelete(): void {
-        this.deleteModal.closeModal()
         if (this.listContainer) {
             this.listContainer.addEventListener('click', (e: any) => {
                 const target = e.target
                 if (target.classList.contains('delete')) {
                     if (target) {
-                        const table = target.closest('table')
-                        // if (table) {
-                        let readyToDelete: any[] = table.querySelectorAll('tbody tr.ready_to_delete')
+                        const table = target.closest('.table')
+                        let readyToDelete: any[] = table.querySelectorAll('.table_body .one_item.ready_to_delete')
                         if (readyToDelete.length > 0) {
                             readyToDelete.forEach(
                                 (item: any) => {
@@ -46,11 +43,9 @@ abstract class AbstractListControlsController implements ListControlsControllerI
                                 }
                             )
                         }
-                        // }
-                        let closestTr = target.closest('tr')
+                        let closestTr = target.closest('.one_item')
                         if (closestTr) {
                             closestTr.classList.add('ready_to_delete')
-                            this.deleteModal.confirmModal(this.listRenderFunction)
                         }
                     }
                 }
@@ -61,10 +56,10 @@ abstract class AbstractListControlsController implements ListControlsControllerI
         const table = document.querySelector('.items_list_container .table')
         if (table) {
             table.addEventListener('click', (e: any) => {
-                let infoActiveItem: any = table.querySelectorAll('tbody tr.info_active')
+                let infoActiveItem: any = table.querySelectorAll('.table_body .one_item.info_active')
                 const target = e.target
                 if (target.classList.contains('info')) {
-                    let itemElement = target.closest('tr')
+                    let itemElement = target.closest('.one_item')
                     let itemId = itemElement.dataset.id
                     if (infoActiveItem.length > 0) {
                         infoActiveItem.forEach(
@@ -75,7 +70,7 @@ abstract class AbstractListControlsController implements ListControlsControllerI
                     }
                     itemElement.classList.add('info_active')
                     const list  = this.stateManager.getState('list')
-                    const modalData: any = itemFindFunc(list,+itemId)
+                    const modalData: any = itemFindById(list,+itemId)
                     this.infoModalController.renderModal(modalData)
                 }
             })
@@ -86,7 +81,7 @@ abstract class AbstractListControlsController implements ListControlsControllerI
                 const target:any = e.target
                 if(target.classList.contains('add_into_this')){
                     const formOpenCloseButton:any = document.querySelector('#add_new_form_open')
-                    const parentId = target.closest('tr').dataset.id
+                    const parentId = target.closest('.one_item').dataset.id
                     const form:any = document.querySelector('.form_container .entity_form')
                     formOpenCloseButton.click();
                     form.querySelector('input.parent_id').value = parentId

@@ -129,7 +129,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
         var perPageInput = document.getElementById('per_page');
         if (perPageInput) {
             perPageInput.oninput = function (e) {
-                _this.stateManager.setState('per_page', e.target.value);
+                _this.stateManager.setState('per_page', +e.target.value);
                 _this.renderList();
             };
         }

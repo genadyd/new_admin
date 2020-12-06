@@ -106,76 +106,81 @@
   z-index: 99999;
 }
 
-#content_container #categories_list_container table {
+#content_container #categories_list_container .table {
   font-size: 14px;
 }
 
-#content_container #categories_list_container table thead th .sort_icon {
-  color: #ED7117;
-  margin-left: 0px;
+#content_container #categories_list_container .table .table_body .one_item .controls_field button {
+  border: none;
+  padding: 0;
+  background: none;
+  line-height: 1;
+  outline: none !important;
+}
+
+#content_container #categories_list_container .table .table_body .one_item .controls_field .material-icons {
+  line-height: 1;
+  color: #636b6f;
   cursor: pointer;
 }
 
-#content_container #categories_list_container table thead th.item_id_heading {
-  text-align: center;
+#content_container #categories_list_container .table .table_body .one_item .controls_field .material-icons:hover {
+  color: #ED7117;
 }
 
-#content_container #categories_list_container table thead .controls_th {
-  width: 10%;
-}
-
-#content_container #categories_list_container table tbody tr {
-  border-top: 1px solid #dee2e6;
-  position: relative;
-}
-
-#content_container #categories_list_container table tbody tr.deleted {
-  background: #636b6f;
-  color: #fff;
-}
-
-#content_container #categories_list_container table tbody tr.deleted td.cat_controls .material-icons {
-  line-height: 1;
-  color: #fff;
-}
-
-#content_container #categories_list_container table tbody tr.new {
-  background-color: #128fce;
-  color: #fff;
-}
-
-#content_container #categories_list_container table tbody tr.new td.cat_controls .material-icons {
-  line-height: 1;
-  color: #fff;
-}
-
-#content_container #categories_list_container table tbody tr td {
-  border-top: none;
-}
-
-#content_container #categories_list_container table tbody tr td .finded {
+#content_container #categories_list_container .table .table_body .one_item .name_field .finded,
+#content_container #categories_list_container .table .table_body .one_item .heading_field .finded {
   background-color: #ED7117;
   color: #fff;
 }
 
-#content_container #categories_list_container table tbody tr td.item_num {
+#content_container #categories_list_container .table .table_body .one_item.deleted {
+  background: #636b6f;
+  color: #fff;
+}
+
+#content_container #categories_list_container .table .table_body .one_item.deleted .controls_field .material-icons {
+  line-height: 1;
+  color: #fff;
+}
+
+#content_container #categories_list_container .table .table_body .one_item.new {
+  background-color: #128fce;
+  color: #fff;
+}
+
+#content_container #categories_list_container .table .table_body .one_item.new td.cat_controls .material-icons {
+  line-height: 1;
+  color: #fff;
+}
+
+#content_container #categories_list_container .table .table_body .one_item td {
+  border-top: none;
+}
+
+#content_container #categories_list_container .table .table_body .one_item td .finded {
+  background-color: #ED7117;
+  color: #fff;
+}
+
+#content_container #categories_list_container .table .table_body .one_item td.item_num {
   width: 3%;
 }
 
-#content_container #categories_list_container table tbody tr td.item_id {
+#content_container #categories_list_container .table .table_body .one_item td.item_id {
   width: 5%;
   text-align: center;
 }
 
-#content_container #categories_list_container table tbody tr td.item_name {
+#content_container #categories_list_container .table .table_body .one_item td.item_name {
   width: 25%;
 }
 
-#content_container #categories_list_container table tbody tr td.item_heading {
+#content_container #categories_list_container .table .table_body .one_item td.item_heading {
   width: 35%;
 }
 
-#content_container #categories_list_container table tbody tr td.cat_controls button {
+#content_container #categories_list_container .table .table_body .one_item td.cat_controls button {
   line-height: 1;
   border: none;
   outline: none !important;
@@ -183,7 +188,7 @@
   background-color: transparent;
 }
 
-#content_container #categories_list_container table tbody tr td.cat_controls .material-icons {
+#content_container #categories_list_container .table .table_body .one_item td.cat_controls .material-icons {
   line-height: 1;
   cursor: pointer;
 }

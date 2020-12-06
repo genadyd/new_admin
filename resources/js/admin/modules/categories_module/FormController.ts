@@ -2,7 +2,7 @@ import CategoriesApi from "../../app/api/CategoriesApi";
 import TextFieldController from "./TextFieldController";
 import AbstractFormController from "../../app/controllers/forms_controllers/AbstractFormController";
 import FormControllersInterface from "../../app/controllers/forms_controllers/FormControllersInterface";
-import {itemFindFunc} from "../../lib/item_find/item_find";
+import {itemFindById} from "../../lib/item_find/items_find";
 
 
 class FormController extends AbstractFormController implements FormControllersInterface  {
@@ -55,7 +55,7 @@ class FormController extends AbstractFormController implements FormControllersIn
                         if(data.category.parent === 0) {
                             state.push(data.category)
                         }else{
-                          const elem:any =  itemFindFunc( state, data.category.parent)
+                          const elem:any =  itemFindById( state, data.category.parent)
                             if(!elem.children_list)elem['children_list'] = []
                             if(elem) elem.children_list.push(data.category)
                         }

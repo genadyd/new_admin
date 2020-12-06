@@ -31,7 +31,7 @@ var ListController = /** @class */ (function (_super) {
             var list = _this.listProcessor.getList();
             var builder = _this.getListBuilder();
             var listHtml = builder.build(list);
-            var tableContainer = document.querySelector('#categories_list_container .table tbody');
+            var tableContainer = document.querySelector('#categories_list_container .table .table_body');
             if (tableContainer) {
                 tableContainer.innerHTML = listHtml;
             }

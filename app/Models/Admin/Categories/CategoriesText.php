@@ -28,13 +28,13 @@ class CategoriesText extends Model
 public function getAllTextsFields(){
     return DB::table($this->table)->orderBy('category_id')->get();
 }
-public function teextFieldDeleteByCatId(int $id){
-        DB::table($this->table)->where('category_id',$id)->update(['deleted_at'=>Carbon::now()]);
+public function textFieldDeleteByCatId(array $ids){
+        DB::table($this->table)->whereIn('category_id',$ids)->update(['deleted_at'=>Carbon::now()]);
 }
 public function textFieldDeletedRestore(int $id){
     DB::table($this->table)->where('category_id',$id)->update(['deleted_at'=>null]);
 }
 public function getTextFieldsDataByCategoryId(int $id){
-   return DB::table($this->table)->where('category_id',$id)->where('deleted_at',null)->get();
+   return DB::table($this->table)->where('category_id',$id)->get();
 }
 }

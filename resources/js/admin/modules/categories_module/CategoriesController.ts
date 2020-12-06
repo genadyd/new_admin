@@ -4,10 +4,11 @@ import ListController from "./ListController";
 import {State} from "./CategoriesState";
 import CategoriesApi from "../../app/api/CategoriesApi";
 import CategoriesStateManager from "./CategoriesStateManager";
-import ListProcessor from "../../lib/list_processor/ListProcessor";
 import ListControlsControllerInterface
     from "../../app/controllers/list_controllers/list_controls_controller/ListControlsControllerInterface";
 import ListControlsController from "./ListControlsController";
+import DeleteModalController from "./modals_controllers/DeleteModalController";
+import ListProcessor from "./list_processor/ListProcessor";
 
 
 class CategoriesController {
@@ -16,6 +17,7 @@ class CategoriesController {
     private readonly stateManager:any
     private readonly listProcessor:any
     private readonly listController: any
+    private readonly deleteModal:ModalControllerInterface
     private listControlsController:ListControlsControllerInterface
 
     constructor() {
@@ -23,13 +25,18 @@ class CategoriesController {
         this.listProcessor = new ListProcessor(this.stateManager)
         this.listController = new ListController(this.stateManager,this.listProcessor)
         this.formController = new FormController(this.stateManager)
+        this.deleteModal = new DeleteModalController(this.stateManager)
 
         /* set rerender list func from listController */
         this.formController.getRenderFunc(this.listController.renderList, this.listController )
         this.listControlsController = new ListControlsController(this.stateManager)
 
-        /* set rerender list func from listController */
+        /* set rerender list func from listControlsController */
         this.listControlsController.getRenderFunc(this.listController.renderList, this.listController )
+        /*set render list function*/
+        if(this.deleteModal.setListRenderFunction) {
+            this.deleteModal.setListRenderFunction(this.listController.renderList, this.listController)
+        }
 /*
 * init state with values
 * */
@@ -66,11 +73,6 @@ class CategoriesController {
         const Api = new CategoriesApi('/admin/categories/get_list', 'POST', {formData: JSON.stringify(formData)})
         const promise: any = Api.exeq()
         promise.then((data: any) => {
-           // let dataRes:{[key:number]:any} = {}
-           //  data.forEach((val:any)=>{
-           //      dataRes[+val.id] = val
-           //  })
-           //  console.log(dataRes)
             this.stateManager.setState('list', data)
             this.listController.renderList()
         })

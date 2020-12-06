@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var CategoriesApi_1 = __importDefault(require("../../app/api/CategoriesApi"));
 var TextFieldController_1 = __importDefault(require("./TextFieldController"));
 var AbstractFormController_1 = __importDefault(require("../../app/controllers/forms_controllers/AbstractFormController"));
-var item_find_1 = require("../../lib/item_find/item_find");
+var items_find_1 = require("../../lib/item_find/items_find");
 var FormController = /** @class */ (function (_super) {
     __extends(FormController, _super);
     function FormController(stateManager) {
@@ -68,7 +68,7 @@ var FormController = /** @class */ (function (_super) {
                                 state.push(data.category);
                             }
                             else {
-                                var elem = item_find_1.itemFindFunc(state, data.category.parent);
+                                var elem = items_find_1.itemFindById(state, data.category.parent);
                                 if (!elem.children_list)
                                     elem['children_list'] = [];
                                 if (elem)

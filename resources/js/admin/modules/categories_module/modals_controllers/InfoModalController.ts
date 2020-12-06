@@ -35,7 +35,7 @@ class InfoModalController implements ModalControllerInterface{
 
         /* set data deleted*/
         const daletedDataArea = this.modalContainer.querySelector('.modal-body .deleted_time .date')
-        if(daletedDataArea) daletedDataArea.innerHTML= modalData.deleted_at?`<small>${modalData.deleted_at}</small>`:''
+        if(daletedDataArea) daletedDataArea.innerHTML= modalData.deleted_at ?`<small>${modalData.deleted_at}</small>`:''
 
         /* set title*/
         const titleArea = this.modalContainer.querySelector('.modal_data_container .title .text')

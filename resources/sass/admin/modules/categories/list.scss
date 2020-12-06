@@ -3,33 +3,37 @@
     .modal{
         z-index: 99999;
     }
-    table{
+    .table{
         font-size: 14px;
-        thead{
-           th{
-               //padding: .75rem 2px;
-              .sort_icon{
-                  color: $orange-color;
-                  margin-left: 0px;
-                  cursor: pointer;
-              }
-               &.item_id_heading{
-                   text-align: center;
-               }
-           }
-            .controls_th{
-                width: 10%;
-
-            }
-        }
-        tbody{
-            tr {
-                border-top: 1px solid #dee2e6;
-                position: relative;
+        .table_body{
+            .one_item {
+                .controls_field{
+                    button{
+                        border: none;
+                        padding: 0;
+                        background: none;
+                        line-height: 1;
+                        outline:none !important;
+                    }
+                    .material-icons{
+                        line-height: 1;
+                        color: $orange-dark;
+                        cursor: pointer;
+                        &:hover{
+                            color: $orange-color;
+                        }
+                    }
+                }
+                .name_field, .heading_field{
+                   .finded{
+                       background-color: $orange-color;
+                       color: #fff;
+                   }
+                }
                 &.deleted{
                     background: $orange-dark;
                     color:#fff;
-                    td.cat_controls{
+                    .controls_field{
                         .material-icons{
                             line-height: 1;
                             color: #fff;
@@ -76,7 +80,7 @@
                             box-shadow:none;
                             background-color: transparent;
                         }
-                        .material-icons{
+                        .material-icons,{
                             line-height: 1;
                             cursor: pointer;
                         }

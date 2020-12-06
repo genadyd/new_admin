@@ -3,7 +3,7 @@ import ListBuilder from "./list/html_builders/ListBuilder";
 import AbstractPaginationBuilder from "../../app/UI/list_builders/AbstractPaginationBuilder";
 import PaginationBuilder from "./list/html_builders/PaginationBuilder";
 import StateManagerInterface from "../../app/state_manager/StateManagerInterface";
-import ListProcessor from "../../lib/list_processor/ListProcessor";
+import ListProcessor from "../../app/list_processor/AbstractListProcessor";
 class ListController extends AbstractListController{
     // protected token:any
     protected listener: any
@@ -36,7 +36,7 @@ class ListController extends AbstractListController{
         const list = this.listProcessor.getList()
         const builder = this.getListBuilder()
         const listHtml: string = builder.build(list)
-        const tableContainer = document.querySelector('#categories_list_container .table tbody')
+        const tableContainer = document.querySelector('#categories_list_container .table .table_body')
         if (tableContainer) {
             tableContainer.innerHTML = listHtml
         }

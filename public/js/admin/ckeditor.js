@@ -93,9 +93,7 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-CKEDITOR.replace('ckeditor_text', {
-  customConfig: '../ckeditor/custom_config.js'
-});
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nError: ENOENT: no such file or directory, open '/var/www/html/new_admin/resources/js/admin/ckeditor.js'");
 
 /***/ }),
 

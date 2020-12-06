@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 //Route::middleware('auth:api')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
-Route::prefix('admin')->namespace('Admin')->middleware('web')->group(function ($request) {
+Route::prefix('admin')->namespace('Admin')->middleware(['web'])->group(function ($request) {
     Route::post('/get_submenu', 'GeMenuController@getSubmenuJson');
     Route::post('/categories/add_category', 'Categories\FormController@getData');
     Route::post('/categories/get_list', 'Categories\ListController@getList');

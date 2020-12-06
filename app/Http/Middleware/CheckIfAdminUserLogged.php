@@ -16,7 +16,8 @@ class CheckIfAdminUserLogged
      */
     public function handle($request, Closure $next)
     {
-//        dd(csrf_token());
-        return $next($request);
+
+            return $next($request);
+
     }
 }

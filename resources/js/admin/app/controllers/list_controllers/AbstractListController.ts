@@ -1,7 +1,7 @@
 import AbstractPaginationBuilder from "../../UI/list_builders/AbstractPaginationBuilder";
 // import ListControllerInterface from "./ListControllerInterface";
 import StateManagerInterface from "../../state_manager/StateManagerInterface";
-import ListProcessor from "../../../lib/list_processor/ListProcessor";
+import ListProcessor from "../../list_processor/AbstractListProcessor";
 
 abstract class AbstractListController /*implements ListControllerInterface*/ {
     protected token: any
@@ -120,7 +120,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
         const perPageInput = document.getElementById('per_page')
         if (perPageInput) {
             perPageInput.oninput = (e: any) => {
-                this.stateManager.setState('per_page', e.target.value)
+                this.stateManager.setState('per_page', +e.target.value)
                 this.renderList()
             }
         }

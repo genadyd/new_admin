@@ -31,32 +31,22 @@ class ListController extends BaseDataController
     public function getList()
     {
         $categories_list = $this->model->getAllCategories();
-
-        $texts_fields = $this->text_field_model->getAllTextsFields();
-        $result_array = [];
-//        dd($categories_list);
-        foreach ($categories_list as $key => $val) {
-            if (!isset($val->text_fields)) {
-                $categories_list[$key]->text_fields = array();
-            }
-            foreach ($texts_fields as $tv) {
-                if ($tv->category_id === $val->id) {
-                    array_push($categories_list[$key]->text_fields, $tv);
-                }
-            }
-            $categories_list[$key]->text_field_num = count($categories_list[$key]->text_fields);
-            $result_array[] = $categories_list[$key];
+        $res_list = [];
+        foreach ($categories_list as $val){
+            $res_list[] =$val;
         }
-
-        echo json_encode($result_array);
+        echo json_encode($res_list);
     }
 
    public function categoryDelete(Request $request){
        $post_data = json_decode($request->input('formData'));
-       $delete_res = $this->model->categoryDelete($post_data->id);
-       if($delete_res[0] === 1) {
-           $this->text_field_model->teextFieldDeleteByCatId($post_data->id);
+       $delete_res = $this->model->categoryDelete($post_data->ids);
+       /*'deleted_num'
+'deleted_items'*/
+       if($delete_res['deleted_num']>0){
+           $this->text_field_model->textFieldDeleteByCatId($post_data->ids);
        }
+
        return json_encode($delete_res);
    }
    public function categoryRestore(Request $request){

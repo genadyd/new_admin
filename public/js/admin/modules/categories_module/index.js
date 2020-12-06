@@ -696,7 +696,7 @@ function () {
 
     if (perPageInput) {
       perPageInput.oninput = function (e) {
-        _this.stateManager.setState('per_page', e.target.value);
+        _this.stateManager.setState('per_page', +e.target.value);
 
         _this.renderList();
       };
@@ -813,7 +813,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var item_find_1 = __webpack_require__(/*! ../../../../lib/item_find/item_find */ "./resources/js/admin/lib/item_find/item_find.js");
+var items_find_1 = __webpack_require__(/*! ../../../../lib/item_find/items_find */ "./resources/js/admin/lib/item_find/items_find.js");
 
 var AbstractListControlsController =
 /** @class */
@@ -835,33 +835,25 @@ function () {
   };
 
   AbstractListControlsController.prototype.itemDelete = function () {
-    var _this = this;
-
-    this.deleteModal.closeModal();
-
     if (this.listContainer) {
       this.listContainer.addEventListener('click', function (e) {
         var target = e.target;
 
         if (target.classList.contains('delete')) {
           if (target) {
-            var table = target.closest('table'); // if (table) {
-
-            var readyToDelete = table.querySelectorAll('tbody tr.ready_to_delete');
+            var table = target.closest('.table');
+            var readyToDelete = table.querySelectorAll('.table_body .one_item.ready_to_delete');
 
             if (readyToDelete.length > 0) {
               readyToDelete.forEach(function (item) {
                 item.classList.remove('ready_to_delete');
               });
-            } // }
+            }
 
-
-            var closestTr = target.closest('tr');
+            var closestTr = target.closest('.one_item');
 
             if (closestTr) {
               closestTr.classList.add('ready_to_delete');
-
-              _this.deleteModal.confirmModal(_this.listRenderFunction);
             }
           }
         }
@@ -876,11 +868,11 @@ function () {
 
     if (table) {
       table.addEventListener('click', function (e) {
-        var infoActiveItem = table.querySelectorAll('tbody tr.info_active');
+        var infoActiveItem = table.querySelectorAll('.table_body .one_item.info_active');
         var target = e.target;
 
         if (target.classList.contains('info')) {
-          var itemElement = target.closest('tr');
+          var itemElement = target.closest('.one_item');
           var itemId = itemElement.dataset.id;
 
           if (infoActiveItem.length > 0) {
@@ -893,7 +885,7 @@ function () {
 
           var list = _this.stateManager.getState('list');
 
-          var modalData = item_find_1.itemFindFunc(list, +itemId);
+          var modalData = items_find_1.itemFindById(list, +itemId);
 
           _this.infoModalController.renderModal(modalData);
         }
@@ -907,7 +899,7 @@ function () {
 
       if (target.classList.contains('add_into_this')) {
         var formOpenCloseButton = document.querySelector('#add_new_form_open');
-        var parentId = target.closest('tr').dataset.id;
+        var parentId = target.closest('.one_item').dataset.id;
         var form = document.querySelector('.form_container .entity_form');
         formOpenCloseButton.click();
         form.querySelector('input.parent_id').value = parentId;
@@ -921,6 +913,100 @@ function () {
 }();
 
 exports["default"] = AbstractListControlsController;
+
+/***/ }),
+
+/***/ "./resources/js/admin/app/list_processor/AbstractListProcessor.js":
+/*!************************************************************************!*\
+  !*** ./resources/js/admin/app/list_processor/AbstractListProcessor.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AbstractListProcessor =
+/** @class */
+function () {
+  function AbstractListProcessor(stateManager) {
+    this.stateManager = stateManager;
+  }
+
+  AbstractListProcessor.prototype.onlyDeleted = function (list) {
+    if (this.stateManager.getState('only_deleted')) {
+      return list.filter(function (val) {
+        return val.deleted_at;
+      });
+    }
+
+    return list;
+  };
+
+  AbstractListProcessor.prototype.renderPerPage = function (list) {
+    if (list.length > 0) {
+      var perPageNum = this.stateManager.getState('per_page') || 0;
+      var perPage = perPageNum != 0 ? perPageNum : list.length;
+      var currentPage = this.stateManager.getState('current_page');
+      var lastPage = Math.ceil(list.length / perPage);
+
+      if (currentPage > lastPage) {
+        this.stateManager.setState('current_page', lastPage);
+        currentPage = lastPage;
+      }
+
+      var offset_1 = currentPage * perPage - perPage;
+      var limit_1 = currentPage * perPage;
+      list.forEach(function (item, key) {
+        item.to_render = key >= offset_1 && key < limit_1;
+      });
+    }
+
+    return list;
+  };
+
+  AbstractListProcessor.prototype.includeDeleted = function (list) {
+    if (!this.stateManager.getState('include_deleted')) {
+      return list.filter(function (val) {
+        return !val.deleted_at;
+      });
+    }
+
+    return list;
+  };
+
+  AbstractListProcessor.prototype.sortByField = function (_a) {
+    var list = _a.slice(0);
+
+    var _b = this.stateManager.getState('sort_by'),
+        field = _b.field,
+        direction = _b.direction;
+
+    if (direction === 'asc') {
+      list.sort(function (a, b) {
+        if (a[field] > b[field]) return 1;
+        if (a[field] < b[field]) return -1;
+        return 0;
+      });
+    } else {
+      list.sort(function (a, b) {
+        if (a[field] > b[field]) return -1;
+        if (a[field] < b[field]) return 1;
+        return 0;
+      });
+    }
+
+    return list;
+  };
+
+  return AbstractListProcessor;
+}();
+
+exports["default"] = AbstractListProcessor;
 
 /***/ }),
 
@@ -1018,10 +1104,10 @@ exports["default"] = FormFieldsValidator;
 
 /***/ }),
 
-/***/ "./resources/js/admin/lib/item_find/item_find.js":
-/*!*******************************************************!*\
-  !*** ./resources/js/admin/lib/item_find/item_find.js ***!
-  \*******************************************************/
+/***/ "./resources/js/admin/lib/item_find/items_find.js":
+/*!********************************************************!*\
+  !*** ./resources/js/admin/lib/item_find/items_find.js ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1031,29 +1117,45 @@ exports["default"] = FormFieldsValidator;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.itemFindFunc = void 0;
+exports.itemsFindTree = exports.itemFindById = void 0;
 
-exports.itemFindFunc = function (list, itemId) {
+exports.itemFindById = function (list, itemId) {
   var res = 0;
-  list.forEach(function (val) {
-    if (val.id === itemId) {
-      res = val;
-      return res;
-    }
 
-    if (val.children_list && val.children_list.length > 0) {
-      return exports.itemFindFunc(val.children_list, itemId);
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].id === itemId) {
+      res = list[i];
+      break;
+    } else if (list[i].children_list && list[i].children_list.length > 0) {
+      res = exports.itemFindById(list[i].children_list, +itemId);
     }
-  });
+  }
+
   return res;
+};
+
+exports.itemsFindTree = function (firstElement, resElementsArray) {
+  if (resElementsArray === void 0) {
+    resElementsArray = [];
+  }
+
+  resElementsArray.push(firstElement.id);
+
+  if (firstElement.children_list && firstElement.children_list.length > 0) {
+    firstElement.children_list.forEach(function (item) {
+      return exports.itemsFindTree(item, resElementsArray);
+    });
+  }
+
+  return resElementsArray;
 };
 
 /***/ }),
 
-/***/ "./resources/js/admin/lib/list_processor/ListProcessor.js":
-/*!****************************************************************!*\
-  !*** ./resources/js/admin/lib/list_processor/ListProcessor.js ***!
-  \****************************************************************/
+/***/ "./resources/js/admin/lib/list_search_recursive/recursive_search.js":
+/*!**************************************************************************!*\
+  !*** ./resources/js/admin/lib/list_search_recursive/recursive_search.js ***!
+  \**************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1077,121 +1179,75 @@ var __spreadArrays = this && this.__spreadArrays || function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.recursiveSearchFunction = void 0;
+/*
+* recursive search func
+* @ params :
+*   1. searchString:string
+*   2. fieldsNamesList:string[] - search targets field names
+*   3. list:array - search list
+* @return : new list of funded elements or false
+*
+* */
 
-var ListProcessor =
-/** @class */
-function () {
-  function ListProcessor(stateManager) {
-    this.stateManager = stateManager;
+exports.recursiveSearchFunction = function (searchString, fieldsNamesList, list) {
+  var listRes = [];
+  list = JSON.parse(JSON.stringify(list));
+  /*deep list copy*/
+
+  var pattern = new RegExp(searchString, "g");
+  list.forEach(function (item) {
+    var foundField = fieldsNamesList.filter(function (field) {
+      return pattern.test(item[field]);
+    });
+
+    if (foundField.length > 0) {
+      foundField.forEach(function (f) {
+        item[f] = item[f].replace(pattern, "<span class=\"finded\">" + searchString + "</span>");
+      });
+      listRes.push(item);
+    }
+
+    if (item.children_list && item.children_list.length > 0) {
+      listRes = __spreadArrays(listRes, exports.recursiveSearchFunction(searchString, fieldsNamesList, __spreadArrays(item.children_list)));
+    }
+  });
+  return listRes;
+};
+
+/***/ }),
+
+/***/ "./resources/js/admin/lib/random_color/random_color.js":
+/*!*************************************************************!*\
+  !*** ./resources/js/admin/lib/random_color/random_color.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getRandomColor = void 0;
+
+function getRandomColor(opacity) {
+  if (opacity === void 0) {
+    opacity = '33';
   }
 
-  ListProcessor.prototype.getList = function () {
-    var list = __spreadArrays(this.stateManager.getState('list'));
+  var letters = '0123456789ABCDEF';
+  var color = '#';
 
-    list = this.searchItems(list);
-    list = this.sortByField(list);
-    list = this.includeDeleted(list);
-    list = this.onlyDeleted(list);
-    list = this.renderPerPage(list);
-    return list;
-  };
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
 
-  ListProcessor.prototype.onlyDeleted = function (list) {
-    if (this.stateManager.getState('only_deleted')) {
-      return list.filter(function (val) {
-        return val.deleted_at;
-      });
-    }
+  return color + opacity;
+}
 
-    return list;
-  };
-
-  ListProcessor.prototype.searchItems = function (list) {
-    var searchString = this.stateManager.getState('search_string');
-    /* strip slashes */
-
-    for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
-      var item = list_1[_i];
-      item.name = item.name.replace(/(<([^>]+)>)/gi, "");
-      item.heading = item.heading.replace(/(<([^>]+)>)/gi, "");
-    }
-
-    if (searchString) {
-      var listRes = void 0;
-      var pattern_1 = new RegExp(searchString, "g");
-      listRes = __spreadArrays(list).filter(function (val) {
-        return pattern_1.test(val.heading) || pattern_1.test(val.name);
-      });
-      listRes.forEach(function (item) {
-        item.name = item.name.replace(searchString, "<span class=\"finded\">" + searchString + "</span>");
-        item.heading = item.heading.replace(searchString, "<span class=\"finded\">" + searchString + "</span>");
-      });
-      list = listRes;
-    }
-
-    return list;
-  };
-
-  ListProcessor.prototype.renderPerPage = function (list) {
-    if (list.length > 0) {
-      var perPageNum = this.stateManager.getState('per_page') || 0;
-      var perPage = perPageNum != 0 ? perPageNum : list.length;
-      var currentPage = this.stateManager.getState('current_page');
-      var lastPage = Math.ceil(list.length / perPage);
-
-      if (currentPage > lastPage) {
-        this.stateManager.setState('current_page', lastPage);
-        currentPage = lastPage;
-      }
-
-      var offset_1 = currentPage * perPage - perPage;
-      var limit_1 = currentPage * perPage;
-      list.forEach(function (item, key) {
-        item.to_render = key >= offset_1 && key < limit_1;
-      });
-    }
-
-    return list;
-  };
-
-  ListProcessor.prototype.includeDeleted = function (list) {
-    if (!this.stateManager.getState('include_deleted')) {
-      return list.filter(function (val) {
-        return !val.deleted_at;
-      });
-    }
-
-    return list;
-  };
-
-  ListProcessor.prototype.sortByField = function (_a) {
-    var list = _a.slice(0);
-
-    var _b = this.stateManager.getState('sort_by'),
-        field = _b.field,
-        direction = _b.direction;
-
-    if (direction === 'asc') {
-      list.sort(function (a, b) {
-        if (a[field] > b[field]) return 1;
-        if (a[field] < b[field]) return -1;
-        return 0;
-      });
-    } else {
-      list.sort(function (a, b) {
-        if (a[field] > b[field]) return -1;
-        if (a[field] < b[field]) return 1;
-        return 0;
-      });
-    }
-
-    return list;
-  };
-
-  return ListProcessor;
-}();
-
-exports["default"] = ListProcessor;
+exports.getRandomColor = getRandomColor;
 
 /***/ }),
 
@@ -1225,9 +1281,11 @@ var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../app/api/Cate
 
 var CategoriesStateManager_1 = __importDefault(__webpack_require__(/*! ./CategoriesStateManager */ "./resources/js/admin/modules/categories_module/CategoriesStateManager.js"));
 
-var ListProcessor_1 = __importDefault(__webpack_require__(/*! ../../lib/list_processor/ListProcessor */ "./resources/js/admin/lib/list_processor/ListProcessor.js"));
-
 var ListControlsController_1 = __importDefault(__webpack_require__(/*! ./ListControlsController */ "./resources/js/admin/modules/categories_module/ListControlsController.js"));
+
+var DeleteModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/DeleteModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js"));
+
+var ListProcessor_1 = __importDefault(__webpack_require__(/*! ./list_processor/ListProcessor */ "./resources/js/admin/modules/categories_module/list_processor/ListProcessor.js"));
 
 var CategoriesController =
 /** @class */
@@ -1264,16 +1322,23 @@ function () {
     this.listProcessor = new ListProcessor_1["default"](this.stateManager);
     this.listController = new ListController_1["default"](this.stateManager, this.listProcessor);
     this.formController = new FormController_1["default"](this.stateManager);
+    this.deleteModal = new DeleteModalController_1["default"](this.stateManager);
     /* set rerender list func from listController */
 
     this.formController.getRenderFunc(this.listController.renderList, this.listController);
     this.listControlsController = new ListControlsController_1["default"](this.stateManager);
-    /* set rerender list func from listController */
+    /* set rerender list func from listControlsController */
 
     this.listControlsController.getRenderFunc(this.listController.renderList, this.listController);
+    /*set render list function*/
+
+    if (this.deleteModal.setListRenderFunction) {
+      this.deleteModal.setListRenderFunction(this.listController.renderList, this.listController);
+    }
     /*
     * init state with values
     * */
+
 
     this.fillState();
     /*switch form and list submodules*/
@@ -1293,11 +1358,6 @@ function () {
     });
     var promise = Api.exeq();
     promise.then(function (data) {
-      // let dataRes:{[key:number]:any} = {}
-      //  data.forEach((val:any)=>{
-      //      dataRes[+val.id] = val
-      //  })
-      //  console.log(dataRes)
       _this.stateManager.setState('list', data);
 
       _this.listController.renderList();
@@ -1471,7 +1531,7 @@ var TextFieldController_1 = __importDefault(__webpack_require__(/*! ./TextFieldC
 
 var AbstractFormController_1 = __importDefault(__webpack_require__(/*! ../../app/controllers/forms_controllers/AbstractFormController */ "./resources/js/admin/app/controllers/forms_controllers/AbstractFormController.js"));
 
-var item_find_1 = __webpack_require__(/*! ../../lib/item_find/item_find */ "./resources/js/admin/lib/item_find/item_find.js");
+var items_find_1 = __webpack_require__(/*! ../../lib/item_find/items_find */ "./resources/js/admin/lib/item_find/items_find.js");
 
 var FormController =
 /** @class */
@@ -1527,7 +1587,7 @@ function (_super) {
               if (data.category.parent === 0) {
                 state.push(data.category);
               } else {
-                var elem = item_find_1.itemFindFunc(state, data.category.parent);
+                var elem = items_find_1.itemFindById(state, data.category.parent);
                 if (!elem.children_list) elem['children_list'] = [];
                 if (elem) elem.children_list.push(data.category);
               }
@@ -1664,7 +1724,7 @@ function (_super) {
       var builder = _this.getListBuilder();
 
       var listHtml = builder.build(list);
-      var tableContainer = document.querySelector('#categories_list_container .table tbody');
+      var tableContainer = document.querySelector('#categories_list_container .table .table_body');
 
       if (tableContainer) {
         tableContainer.innerHTML = listHtml;
@@ -1766,11 +1826,11 @@ var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../app/api/Cate
 
 var InfoModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/InfoModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/InfoModalController.js"));
 
-var DeleteModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/DeleteModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js"));
-
-var item_find_1 = __webpack_require__(/*! ../../lib/item_find/item_find */ "./resources/js/admin/lib/item_find/item_find.js");
+var items_find_1 = __webpack_require__(/*! ../../lib/item_find/items_find */ "./resources/js/admin/lib/item_find/items_find.js");
 
 var ListBuilder_1 = __importDefault(__webpack_require__(/*! ./list/html_builders/ListBuilder */ "./resources/js/admin/modules/categories_module/list/html_builders/ListBuilder.js"));
+
+var random_color_1 = __webpack_require__(/*! ../../lib/random_color/random_color */ "./resources/js/admin/lib/random_color/random_color.js");
 
 var ListControlsController =
 /** @class */
@@ -1781,7 +1841,6 @@ function (_super) {
     var _this = _super.call(this, stateManager) || this;
 
     _this.infoModalController = new InfoModalController_1["default"]();
-    _this.deleteModal = new DeleteModalController_1["default"](_this.stateManager);
 
     _this.itemInfo();
 
@@ -1811,8 +1870,7 @@ function (_super) {
       var target = e.target;
 
       if (target && target.classList.contains('restore')) {
-        var id_1 = target.closest('tr').dataset.id;
-        var key = +target.closest('tr').dataset.key;
+        var id_1 = target.closest('.one_item').dataset.id;
         var formData = {
           action: {},
           id: id_1,
@@ -1826,7 +1884,7 @@ function (_super) {
           if (res === 1) {
             var list = _this.stateManager.getState('list');
 
-            var elem = item_find_1.itemFindFunc(list, +id_1);
+            var elem = items_find_1.itemFindById(list, +id_1);
             if (elem) elem.deleted_at = null;
 
             _this.listRenderFunction();
@@ -1839,24 +1897,38 @@ function (_super) {
   ListControlsController.prototype.childrenListView = function () {
     var _this = this;
 
-    var table = document.querySelector('.items_list_container .table');
+    var table = document.querySelector('.items_list_container .table .table_body');
     table.addEventListener('click', function (e) {
       var target = e.target;
 
       if (target.classList.contains('view_list')) {
-        var parentId = target.closest('tr').dataset.id;
+        var itemBox = target.closest('.one_item');
+        var header = itemBox.querySelector('.one_cat_header');
+        var body = itemBox.querySelector('.one_cat_body');
 
-        var list = _this.stateManager.getState('list');
+        if (itemBox.classList.contains('children_show')) {
+          itemBox.classList.remove('children_show');
+          header.style.backgroundColor = 'transparent';
+          header.classList.remove('has_child');
+          body.innerHTML = '';
+          target.innerText = 'expand_more';
+        } else {
+          itemBox.classList.add('children_show');
+          var parentId = itemBox.dataset.id;
 
-        var elem = item_find_1.itemFindFunc(list, +parentId);
-        var listBuilder = new ListBuilder_1["default"]();
-        var html = listBuilder.build(elem.children_list);
+          var list = _this.stateManager.getState('list');
 
-        var currentElement = _this.table.querySelector("tr[data-id=\"" + elem.id + "\"]");
-
-        var parser = new DOMParser();
-        var res = parser.parseFromString(html, 'text/html');
-        table.insertBefore(res, currentElement.nextSiblings);
+          var elem = items_find_1.itemFindById(list, +parentId);
+          elem.children_show = true;
+          var listBuilder = new ListBuilder_1["default"]();
+          var html = listBuilder.build(elem.children_list);
+          target.innerText = 'expand_less';
+          var boxColor = random_color_1.getRandomColor();
+          header.style.backgroundColor = boxColor;
+          header.classList.add('has_child');
+          body.innerHTML = html;
+          body.style.backgroundColor = boxColor;
+        }
       }
     });
   };
@@ -2043,37 +2115,30 @@ function () {
 
     var listHtml = '';
     list.forEach(function (item, key) {
-      listHtml += _this.listHtmlBuild(item, key);
+      if (item.to_render) listHtml += _this.listHtmlBuild(item, key);
     });
     return listHtml;
   };
 
-  ListBuilder.prototype.listHtmlBuildNew = function (item, key) {};
-
   ListBuilder.prototype.listHtmlBuild = function (item, key) {
+    var deleted = item.deleted_at ? ' deleted' : '';
+    var textFieldsNum = item.text_fields.length;
     var listHtml = '';
-    if (item.text_field_num == null) item.text_field_num = 0;
-    var is_new = '';
+    listHtml += "<div class=\"one_item one_cat" + deleted + " \" data-id=\"" + item.id + "\" data-key=\"" + key + "\">" + "<div class=\"one_cat_header row align-items-center py-1 mx-0 py-lg-2 border-bottom\">" + ("<div class=\"id_field col col-1\">" + item.id + "</div>") + ("<div class=\"name_field col-3\">" + item.name + "</div>") + ("<div class=\"heading_field col-4\">" + item.heading + "</div>") + ("<div class=\"text_fields_field col-2\">" + textFieldsNum + "</div>") + "<div class=\"controls_field col-2 d-flex justify-content-end align-items-center\">" + "<span title=\"add into\" class=\"material-icons add_into_this\">add</span>";
 
-    if (item.deleted_at) {
-      listHtml += '<tr class="one_cat deleted" ' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<span title="add into" class="material-icons add_into_this">add</span>';
-
-      if (item.children_list && item.children_list.length > 0) {
-        listHtml += '<span title="list view" class="material-icons view_list">view_list</span>';
-      }
-
-      listHtml += '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_restore_button item_restore_button btn p-0 ml-1" >' + ' <span class="material-icons restore" title="restore">restore</span>' + '</button>' + '</td>' + '</tr>';
-    } else {
-      if (item.is_new) is_new = ' new';
-      listHtml += '<tr class="one_cat' + is_new + '" data-id="' + item.id + '" data-key="' + key + '">' + '<td class="item_num d-none d-lg-table-cell">' + (key + 1) + '</td>' + '<td class="item_id">' + item.id + '</td>' + '<td class="item_name">' + item.name + '</td>' + '<td class="item_heading d-none d-lg-table-cell">' + item.heading + '</td>' + '<td class="item_text_field_num d-none d-lg-table-cell"><span class="badge badge-pill badge-primary">' + item.text_field_num + '</span></td>' + '<td class="cat_controls item_controls d-flex justify-content-center align-items-center">' + '<span title="add into" class="material-icons add_into_this">add</span>';
-
-      if (item.children_list && item.children_list.length > 0) {
-        listHtml += '<span title="list view" class="material-icons view_list">view_list</span>';
-      }
-
-      listHtml += '<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">' + '<span class="material-icons info">info</span>' + '</button>' + '<span class="material-icons edit ml-1">create</span>' + '<button type="button" class="category_delete_button item_delete_button btn p-0 ml-1" data-toggle="modal" data-target="#itemDeleteModal">' + ' <span class="material-icons delete" title="delete">delete</span>' + '</button>' + '</td>' + '</tr>';
+    if (item.children_list && item.children_list.length > 0) {
+      listHtml += '<span title="list view" class="material-icons view_list">expand_more</span>';
     }
 
+    listHtml += "<button type=\"button\" class=\"info_button ml-0\" data-toggle=\"modal\" data-target=\"#categoryInfoModal\">" + "<span class=\"material-icons info\">info</span>" + "</button>" + "<span class=\"material-icons edit ml-1\">create</span>";
+
+    if (item.deleted_at) {
+      listHtml += "<button type=\"button\" class=\"category_restore_button item_restore_button btn p-0 ml-1\" >" + "<span class=\"material-icons restore\" title=\"restore\">restore</span>" + "</button>";
+    } else {
+      listHtml += "<button type=\"button\" class=\"category_delete_button item_delete_button btn p-0 ml-1\" data-toggle=\"modal\" data-target=\"#itemDeleteModal\">" + "<span class=\"material-icons delete\" title=\"delete\">delete</span>" + "</button>";
+    }
+
+    listHtml += "</div></div>\n          <div class=\"one_cat_body pr-3 mb-1\"></div></div>";
     return listHtml;
   };
 
@@ -2148,6 +2213,102 @@ exports["default"] = PaginationBuilder;
 
 /***/ }),
 
+/***/ "./resources/js/admin/modules/categories_module/list_processor/ListProcessor.js":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/admin/modules/categories_module/list_processor/ListProcessor.js ***!
+  \**************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AbstractListProcessor_1 = __importDefault(__webpack_require__(/*! ../../../app/list_processor/AbstractListProcessor */ "./resources/js/admin/app/list_processor/AbstractListProcessor.js"));
+
+var recursive_search_1 = __webpack_require__(/*! ../../../lib/list_search_recursive/recursive_search */ "./resources/js/admin/lib/list_search_recursive/recursive_search.js");
+
+var ListProcessor =
+/** @class */
+function (_super) {
+  __extends(ListProcessor, _super);
+
+  function ListProcessor(stateManager) {
+    return _super.call(this, stateManager) || this;
+  }
+
+  ListProcessor.prototype.getList = function () {
+    var list = __spreadArrays(this.stateManager.getState('list'));
+
+    list = this.searchItems(list);
+    list = this.sortByField(list);
+    list = this.includeDeleted(list);
+    list = this.onlyDeleted(list);
+    list = this.renderPerPage(list);
+    return list;
+  };
+
+  ListProcessor.prototype.searchItems = function (list) {
+    var searchString = this.stateManager.getState('search_string');
+    return searchString ? recursive_search_1.recursiveSearchFunction(searchString, ['heading', 'name'], list) : list;
+  };
+
+  return ListProcessor;
+}(AbstractListProcessor_1["default"]);
+
+exports["default"] = ListProcessor;
+
+/***/ }),
+
 /***/ "./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js":
 /*!**************************************************************************************************!*\
   !*** ./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js ***!
@@ -2170,6 +2331,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../../app/api/CategoriesApi */ "./resources/js/admin/app/api/CategoriesApi.js"));
 
+var items_find_1 = __webpack_require__(/*! ../../../lib/item_find/items_find */ "./resources/js/admin/lib/item_find/items_find.js");
+
 var DeleteModalController =
 /** @class */
 function () {
@@ -2177,7 +2340,12 @@ function () {
     this.stateManager = stateManager;
     var tokenElem = document.querySelector('[name=csrf-token]');
     this.token = tokenElem ? tokenElem.getAttribute('content') : '';
+    this.confirmModal();
   }
+
+  DeleteModalController.prototype.setListRenderFunction = function (listRenderFunc, context) {
+    this.listRenderFunc = listRenderFunc.bind(context);
+  };
 
   DeleteModalController.prototype.closeModal = function () {
     var table = document.querySelector('.items_list_container .table');
@@ -2187,7 +2355,7 @@ function () {
       buttons.forEach(function (button) {
         button.addEventListener('click', function () {
           if (table) {
-            var readyToDelete = table.querySelectorAll('tbody tr.ready_to_delete');
+            var readyToDelete = table.querySelectorAll('.table_body .one_item.ready_to_delete');
 
             if (readyToDelete.length > 0) {
               readyToDelete.forEach(function (item) {
@@ -2200,18 +2368,28 @@ function () {
     }
   };
 
-  DeleteModalController.prototype.confirmModal = function (renderFunc) {
+  DeleteModalController.prototype.confirmModal = function () {
     var _this = this;
 
     var button = document.querySelector('#itemDeleteModal .modal_confirm');
 
     if (button) {
-      button.addEventListener('click', function () {
-        var readySelectionElement = document.querySelector('.items_list_container tbody tr.ready_to_delete');
+      button.addEventListener('click', function (e) {
+        var readySelectionElement = document.querySelector('.items_list_container .table_body .one_item.ready_to_delete');
         if (!readySelectionElement) return;
         var itemId = readySelectionElement.dataset.id;
+
+        var list = _this.stateManager.getState('list');
+
+        var idsList = [];
+        var element = items_find_1.itemFindById(list, +itemId);
+
+        if (element) {
+          idsList = items_find_1.itemsFindTree(element);
+        }
+
         var formData = {
-          id: itemId,
+          ids: idsList,
           'X-CSRF-TOKEN': _this.token ? _this.token : ''
         };
         var Api = new CategoriesApi_1["default"]('/admin/categories/category_delete', 'POST', {
@@ -2219,16 +2397,17 @@ function () {
         });
         var promise = Api.exeq();
         promise.then(function (res) {
-          if (res[0] == 1) {
-            var list = _this.stateManager.getState('list');
-
-            var deletedIndex = list.findIndex(function (item) {
-              return item.id === +itemId;
+          if (res.deleted_num > 0) {
+            // const list = this.stateManager.getState('list')
+            res.deleted_items.forEach(function (item) {
+              var element = items_find_1.itemFindById(list, +item.id);
+              element.deleted_at = item.deleted_at;
             });
-            list[deletedIndex].deleted_at = res[1];
-            renderFunc();
-            var button_1 = document.querySelector('#itemDeleteModal .modal_close');
-            if (button_1) button_1.click();
+
+            _this.listRenderFunc();
+
+            var closeButton = document.querySelector('#itemDeleteModal .modal_close');
+            if (closeButton) closeButton.click();
           }
         });
       });
