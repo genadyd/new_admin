@@ -12,6 +12,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,9 +26,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var AbstractListControlsController_1 = __importDefault(require("../../app/controllers/list_controllers/list_controls_controller/AbstractListControlsController"));
 var CategoriesApi_1 = __importDefault(require("../../app/api/CategoriesApi"));
 var InfoModalController_1 = __importDefault(require("./modals_controllers/InfoModalController"));
-var items_find_1 = require("../../lib/item_find/items_find");
-var ListBuilder_1 = __importDefault(require("./list/html_builders/ListBuilder"));
+// import {itemFindById} from "../../lib/item_find/items_find";
+// import ListBuilder from "./list/html_builders/ListBuilder";
 var random_color_1 = require("../../lib/random_color/random_color");
+var ListRender_1 = __importDefault(require("./ListRender"));
+var CategoriesState_1 = require("./CategoriesState");
 var ListControlsController = /** @class */ (function (_super) {
     __extends(ListControlsController, _super);
     function ListControlsController(stateManager) {
@@ -58,11 +67,12 @@ var ListControlsController = /** @class */ (function (_super) {
                 var promise = Api.exeq();
                 promise.then(function (res) {
                     if (res === 1) {
-                        var list = _this.stateManager.getState('list');
-                        var elem = items_find_1.itemFindById(list, +id_1);
+                        var list = __spreadArrays(_this.stateManager.getState('list'));
+                        var indexes = _this.stateManager.getState('indexes');
+                        var elem = list[indexes[id_1]];
                         if (elem)
                             elem.deleted_at = null;
-                        _this.listRenderFunction();
+                        _this.stateManager.setState('list', list);
                     }
                 });
             }
@@ -86,18 +96,24 @@ var ListControlsController = /** @class */ (function (_super) {
                 }
                 else {
                     itemBox.classList.add('children_show');
-                    var parentId = itemBox.dataset.id;
+                    var parentId_1 = +itemBox.dataset.id;
                     var list = _this.stateManager.getState('list');
-                    var elem = items_find_1.itemFindById(list, +parentId);
-                    elem.children_show = true;
-                    var listBuilder = new ListBuilder_1.default();
-                    var html = listBuilder.build(elem.children_list);
-                    target.innerText = 'expand_less';
-                    var boxColor = random_color_1.getRandomColor();
-                    header.style.backgroundColor = boxColor;
-                    header.classList.add('has_child');
-                    body.innerHTML = html;
-                    body.style.backgroundColor = boxColor;
+                    var indexes = _this.stateManager.getState('indexes');
+                    var elem = list[indexes[parentId_1]];
+                    if (elem.children_count > 0) {
+                        var childrenList = list.filter(function (item) { return item.parent === parentId_1; });
+                        elem.children_show = true;
+                        var listRender = new ListRender_1.default(CategoriesState_1.State);
+                        listRender.renderList(childrenList);
+                        // const listBuilder = new ListBuilder()
+                        // const html = listBuilder.build(childrenList)
+                        target.innerText = 'expand_less';
+                        var boxColor = random_color_1.getRandomColor();
+                        header.style.backgroundColor = boxColor;
+                        header.classList.add('has_child');
+                        // body.innerHTML = html
+                        body.style.backgroundColor = boxColor;
+                    }
                 }
             }
         });

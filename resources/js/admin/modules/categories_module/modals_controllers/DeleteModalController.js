@@ -1,4 +1,11 @@
 "use strict";
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -56,12 +63,11 @@ var DeleteModalController = /** @class */ (function () {
                 var promise = Api.exeq();
                 promise.then(function (res) {
                     if (res.deleted_num > 0) {
-                        // const list = this.stateManager.getState('list')
                         res.deleted_items.forEach(function (item) {
-                            var element = items_find_1.itemFindById(list, +item.id);
+                            var element = items_find_1.itemFindById(__spreadArrays(list), +item.id);
                             element.deleted_at = item.deleted_at;
+                            _this.stateManager.setState('list', list);
                         });
-                        _this.listRenderFunc();
                         var closeButton = document.querySelector('#itemDeleteModal .modal_close');
                         if (closeButton)
                             closeButton.click();

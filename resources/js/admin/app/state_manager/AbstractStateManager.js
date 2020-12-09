@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var AbstractStateManager /*implements ListInterface*/ = /** @class */ (function () {
-    function AbstractStateManager(state) {
-        this.state = state;
+    function AbstractStateManager() {
     }
     AbstractStateManager.prototype.setState = function (stateFieldName, data) {
         this.state[stateFieldName] = data;

@@ -17,11 +17,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var AbstractStateManager_1 = __importDefault(require("../../app/state_manager/AbstractStateManager"));
+var CategoriesApi_1 = __importDefault(require("../../app/api/CategoriesApi"));
+var CategoriesState_1 = require("./CategoriesState");
+var ListRender_1 = __importDefault(require("./ListRender"));
 var CategoriesStateManager = /** @class */ (function (_super) {
     __extends(CategoriesStateManager, _super);
     function CategoriesStateManager() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super.call(this) || this;
+        _this.state = _this.setStateProxy();
+        _this.fillState();
+        return _this;
     }
+    CategoriesStateManager.prototype.setStateProxy = function () {
+        var _this = this;
+        return new Proxy(CategoriesState_1.State, {
+            set: function (target, prop, value, receiver) {
+                target[prop] = value;
+                if (prop === 'list') {
+                    target['indexes'] = _this.fillIndexess(target[prop]);
+                }
+                if (prop !== 'indexes') {
+                    var listRender = new ListRender_1.default(receiver);
+                    listRender.renderList();
+                }
+                return true;
+            }
+        });
+    };
+    CategoriesStateManager.prototype.fillState = function () {
+        var _this = this;
+        var tokenElement = document.querySelector('[name=csrf-token]');
+        var formData = {
+            'X-CSRF-TOKEN': tokenElement ? tokenElement.getAttribute('content') : ''
+        };
+        var Api = new CategoriesApi_1.default('/admin/categories/get_list', 'POST', { formData: JSON.stringify(formData) });
+        var promise = Api.exeq();
+        promise.then(function (data) {
+            _this.state.list = data;
+        });
+    };
+    CategoriesStateManager.prototype.fillIndexess = function (list) {
+        var indexesIdMap = {};
+        list.forEach(function (item, key) {
+            indexesIdMap[item.id] = key;
+        });
+        return indexesIdMap;
+    };
     return CategoriesStateManager;
 }(AbstractStateManager_1.default));
 exports.default = CategoriesStateManager;
