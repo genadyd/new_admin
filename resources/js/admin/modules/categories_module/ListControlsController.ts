@@ -4,9 +4,11 @@ import CategoriesApi from "../../app/api/CategoriesApi";
 import ListControlsControllerInterface
     from "../../app/controllers/list_controllers/list_controls_controller/ListControlsControllerInterface";
 import InfoModalController from "./modals_controllers/InfoModalController";
-import {itemFindById} from "../../lib/item_find/items_find";
-import ListBuilder from "./list/html_builders/ListBuilder";
+// import {itemFindById} from "../../lib/item_find/items_find";
+// import ListBuilder from "./list/html_builders/ListBuilder";
 import {getRandomColor} from "../../lib/random_color/random_color";
+import ListRender from "./ListRender";
+import {State} from "./CategoriesState";
 
 class ListControlsController extends AbstractListControlsController implements ListControlsControllerInterface{
      protected infoModalController:ModalControllerInterface
@@ -41,12 +43,13 @@ class ListControlsController extends AbstractListControlsController implements L
                 }
                 const Api = new CategoriesApi('/admin/categories/category_restore', 'POST', {formData: JSON.stringify(formData)})
                 const promise: any = Api.exeq()
-                promise.then((res: number) => {
+                promise.then((res:number) => {
                         if (res === 1) {
-                            const list = this.stateManager.getState('list')
-                            const elem:any =  itemFindById(list,+id)
+                            const list = [...this.stateManager.getState('list')]
+                            const indexes = this.stateManager.getState('indexes')
+                            const elem:any =  list[indexes[id]]
                             if(elem) elem.deleted_at = null
-                            this.listRenderFunction()
+                            this.stateManager.setState('list',list)
                         }
                     }
                 )
@@ -67,21 +70,26 @@ class ListControlsController extends AbstractListControlsController implements L
                     header.classList.remove('has_child')
                     body.innerHTML = ''
                     target.innerText ='expand_more'
-
                 }else {
                     itemBox.classList.add('children_show')
-                    const parentId = itemBox.dataset.id
+                    const parentId = +itemBox.dataset.id
                     const list = this.stateManager.getState('list')
-                    const elem: any = itemFindById(list, +parentId)
+                    const indexes = this.stateManager.getState('indexes')
+                    const elem: any = list[indexes[parentId]]
+                    if(elem.children_count>0){
+                    const childrenList:any[] = list.filter((item:any)=> item.parent === parentId)
                     elem.children_show = true
-                    const listBuilder = new ListBuilder()
-                    const html = listBuilder.build(elem.children_list)
+                    const listRender = new ListRender(State)
+                        listRender.renderList(childrenList)
+                    // const listBuilder = new ListBuilder()
+                    // const html = listBuilder.build(childrenList)
                     target.innerText ='expand_less'
                     const boxColor = getRandomColor()
                     header.style.backgroundColor = boxColor
                     header.classList.add('has_child')
-                    body.innerHTML = html
+                    // body.innerHTML = html
                     body.style.backgroundColor = boxColor
+                    }
                 }
             }
         })

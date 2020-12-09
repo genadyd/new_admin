@@ -86,17 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./resources/js/admin/ckeditor.js":
-/*!****************************************!*\
-  !*** ./resources/js/admin/ckeditor.js ***!
-  \****************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nError: ENOENT: no such file or directory, open '/var/www/html/new_admin/resources/js/admin/ckeditor.js'");
-
-/***/ }),
-
 /***/ 2:
 /*!**********************************************!*\
   !*** multi ./resources/js/admin/ckeditor.js ***!
@@ -104,7 +93,7 @@ throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /var/www/html/new_admin/resources/js/admin/ckeditor.js */"./resources/js/admin/ckeditor.js");
+!(function webpackMissingModule() { var e = new Error("Cannot find module '/var/www/html/new_admin/resources/js/admin/ckeditor.js'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
 
 
 /***/ })

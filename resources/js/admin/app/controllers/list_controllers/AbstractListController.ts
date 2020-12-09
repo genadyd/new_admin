@@ -1,20 +1,17 @@
 import AbstractPaginationBuilder from "../../UI/list_builders/AbstractPaginationBuilder";
-// import ListControllerInterface from "./ListControllerInterface";
+import ListControllerInterface from "./ListControllerInterface";
 import StateManagerInterface from "../../state_manager/StateManagerInterface";
 import ListProcessor from "../../list_processor/AbstractListProcessor";
 
-abstract class AbstractListController /*implements ListControllerInterface*/ {
+abstract class AbstractListController implements ListControllerInterface {
     protected token: any
     protected listener: any
     protected controls: any
     protected stateManager: StateManagerInterface
     protected listContainer: any
-    protected listProcessor: ListProcessor
 
-    protected constructor(stateManager: StateManagerInterface, listProcessor: ListProcessor) {
+    protected constructor(stateManager: StateManagerInterface) {
         this.stateManager = stateManager
-        this.listProcessor = listProcessor
-
     }
 
 
@@ -22,12 +19,6 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
         const tokenElement = document.querySelector('[name=csrf-token]')
         this.token = tokenElement ? tokenElement.getAttribute('content') : ''
     }
-
-    protected abstract getListBuilder(): void
-
-    public abstract renderList(): void
-
-    protected abstract getPaginationBuilder(): AbstractPaginationBuilder
 
     protected includeDeleted() {
         if (this.listContainer) {
@@ -40,7 +31,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
                         this.stateManager.setState('only_deleted', false)
                         if (onlyDeletedCheckBox) onlyDeletedCheckBox.checked = false
                     }
-                    this.renderList()
+                    // this.renderList()
                 })
             }
         }
@@ -62,7 +53,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
                             this.stateManager.setState('include_deleted', false)
                             if (includeDeletedCheckBox) includeDeletedCheckBox.checked = false
                         }
-                        this.renderList()
+                        // this.renderList()
                     }
                 })
             }
@@ -91,7 +82,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
                 }
             }
             this.stateManager.setState('sort_by', newSortBy)
-            this.renderList()
+            // this.renderList()
         }
         if (this.listContainer) {
             const sortButtons = document.querySelectorAll('.sort_icon[data-sort]')
@@ -109,7 +100,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
             if (sortByDateInput) {
                 sortByDateInput.addEventListener('click', () => {
                     this.stateManager.setState('sort_by_date_desc', !this.stateManager.getState('sort_by_date_desc'))
-                    this.renderList()
+                    // this.renderList()
                 })
             }
 
@@ -121,7 +112,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
         if (perPageInput) {
             perPageInput.oninput = (e: any) => {
                 this.stateManager.setState('per_page', +e.target.value)
-                this.renderList()
+                // this.renderList()
             }
         }
     }
@@ -136,51 +127,11 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
                 } else {
                     this.stateManager.setState('search_string', '')
                 }
-                this.renderList()
+                // this.renderList()
             }
         }
     }
 
-    protected renderPaginationButtons(list: any) {
-        const lastPage = Math.ceil(list.length / +this.stateManager.getState('per_page'))
-        const objectToBuilder = {
-            start_page: 1,
-            current_page: +this.stateManager.getState('current_page'),
-            last_page: +lastPage,
-            buttons_num: lastPage < 3 ? lastPage : 3
-        }
-        if (objectToBuilder.current_page == objectToBuilder.last_page) { /*if last page*/
-            if (objectToBuilder.last_page > 2) {
-                objectToBuilder.start_page = objectToBuilder.current_page - 2
-                objectToBuilder.buttons_num = objectToBuilder.last_page
-            } else if (objectToBuilder.last_page == 2) {
-                objectToBuilder.start_page = objectToBuilder.current_page - 1
-                objectToBuilder.buttons_num = objectToBuilder.last_page
-            } else {
-                objectToBuilder.buttons_num = 0
-            }
-        } else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {
-            objectToBuilder.start_page = objectToBuilder.current_page - 1
-            objectToBuilder.buttons_num = objectToBuilder.current_page + 1
-        } else {
-            objectToBuilder.start_page = 1
-        }
-
-        return objectToBuilder
-    }
-
-    protected setListItemsNumberMaxParam = (list: any[]) => {
-        const perPageInput: any = document.getElementById('per_page')
-        if (perPageInput) {
-            let len: number = list.length
-            perPageInput.setAttribute('max', len)
-            if (this.stateManager.getState('per_page') > len) {
-                perPageInput.value = len
-            } else {
-                perPageInput.value = this.stateManager.getState('per_page')
-            }
-        }
-    }
 
     protected pageSwitch() {
         if (this.listContainer) {
@@ -194,7 +145,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
                         try {
                             let pageNum = target.getAttribute('page_num')
                             this.stateManager.setState('current_page', pageNum)
-                            this.renderList()
+                            // this.renderList()
                         } catch (error) {
                             console.error('Expected attribute "page_num" in target Button')
                         }
@@ -212,7 +163,7 @@ abstract class AbstractListController /*implements ListControllerInterface*/ {
         // items.push(newItemObject)
         const lastPage = Math.ceil(items.length / +this.stateManager.getState('per_page'))
         this.stateManager.setState('current_page', lastPage)
-        this.renderList()
+        // this.renderList()
     }
 
 }

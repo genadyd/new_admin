@@ -542,31 +542,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var AbstractListController
-/*implements ListControllerInterface*/
-=
+var AbstractListController =
 /** @class */
 function () {
-  function AbstractListController(stateManager, listProcessor) {
-    var _this = this;
-
-    this.setListItemsNumberMaxParam = function (list) {
-      var perPageInput = document.getElementById('per_page');
-
-      if (perPageInput) {
-        var len = list.length;
-        perPageInput.setAttribute('max', len);
-
-        if (_this.stateManager.getState('per_page') > len) {
-          perPageInput.value = len;
-        } else {
-          perPageInput.value = _this.stateManager.getState('per_page');
-        }
-      }
-    };
-
+  function AbstractListController(stateManager) {
     this.stateManager = stateManager;
-    this.listProcessor = listProcessor;
   }
 
   AbstractListController.prototype.getToken = function () {
@@ -590,9 +570,8 @@ function () {
             _this.stateManager.setState('only_deleted', false);
 
             if (onlyDeletedCheckBox) onlyDeletedCheckBox.checked = false;
-          }
+          } // this.renderList()
 
-          _this.renderList();
         });
       }
     }
@@ -621,9 +600,8 @@ function () {
               _this.stateManager.setState('include_deleted', false);
 
               if (includeDeletedCheckBox) includeDeletedCheckBox.checked = false;
-            }
+            } // this.renderList()
 
-            _this.renderList();
           }
         });
       }
@@ -657,9 +635,8 @@ function () {
         }
       }
 
-      _this.stateManager.setState('sort_by', newSortBy);
+      _this.stateManager.setState('sort_by', newSortBy); // this.renderList()
 
-      _this.renderList();
     };
 
     if (this.listContainer) {
@@ -681,9 +658,8 @@ function () {
 
       if (sortByDateInput) {
         sortByDateInput.addEventListener('click', function () {
-          _this.stateManager.setState('sort_by_date_desc', !_this.stateManager.getState('sort_by_date_desc'));
+          _this.stateManager.setState('sort_by_date_desc', !_this.stateManager.getState('sort_by_date_desc')); // this.renderList()
 
-          _this.renderList();
         });
       }
     }
@@ -696,9 +672,8 @@ function () {
 
     if (perPageInput) {
       perPageInput.oninput = function (e) {
-        _this.stateManager.setState('per_page', +e.target.value);
+        _this.stateManager.setState('per_page', +e.target.value); // this.renderList()
 
-        _this.renderList();
       };
     }
   };
@@ -716,41 +691,10 @@ function () {
           _this.stateManager.setState('search_string', value);
         } else {
           _this.stateManager.setState('search_string', '');
-        }
+        } // this.renderList()
 
-        _this.renderList();
       };
     }
-  };
-
-  AbstractListController.prototype.renderPaginationButtons = function (list) {
-    var lastPage = Math.ceil(list.length / +this.stateManager.getState('per_page'));
-    var objectToBuilder = {
-      start_page: 1,
-      current_page: +this.stateManager.getState('current_page'),
-      last_page: +lastPage,
-      buttons_num: lastPage < 3 ? lastPage : 3
-    };
-
-    if (objectToBuilder.current_page == objectToBuilder.last_page) {
-      /*if last page*/
-      if (objectToBuilder.last_page > 2) {
-        objectToBuilder.start_page = objectToBuilder.current_page - 2;
-        objectToBuilder.buttons_num = objectToBuilder.last_page;
-      } else if (objectToBuilder.last_page == 2) {
-        objectToBuilder.start_page = objectToBuilder.current_page - 1;
-        objectToBuilder.buttons_num = objectToBuilder.last_page;
-      } else {
-        objectToBuilder.buttons_num = 0;
-      }
-    } else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {
-      objectToBuilder.start_page = objectToBuilder.current_page - 1;
-      objectToBuilder.buttons_num = objectToBuilder.current_page + 1;
-    } else {
-      objectToBuilder.start_page = 1;
-    }
-
-    return objectToBuilder;
   };
 
   AbstractListController.prototype.pageSwitch = function () {
@@ -769,9 +713,8 @@ function () {
             try {
               var pageNum = target.getAttribute('page_num');
 
-              _this.stateManager.setState('current_page', pageNum);
+              _this.stateManager.setState('current_page', pageNum); // this.renderList()
 
-              _this.renderList();
             } catch (error) {
               console.error('Expected attribute "page_num" in target Button');
             }
@@ -788,8 +731,7 @@ function () {
     var items = this.stateManager.getState('list'); // items.push(newItemObject)
 
     var lastPage = Math.ceil(items.length / +this.stateManager.getState('per_page'));
-    this.stateManager.setState('current_page', lastPage);
-    this.renderList();
+    this.stateManager.setState('current_page', lastPage); // this.renderList()
   };
 
   return AbstractListController;
@@ -933,12 +875,12 @@ Object.defineProperty(exports, "__esModule", {
 var AbstractListProcessor =
 /** @class */
 function () {
-  function AbstractListProcessor(stateManager) {
-    this.stateManager = stateManager;
+  function AbstractListProcessor(state) {
+    this.state = state;
   }
 
   AbstractListProcessor.prototype.onlyDeleted = function (list) {
-    if (this.stateManager.getState('only_deleted')) {
+    if (this.state.only_deleted) {
       return list.filter(function (val) {
         return val.deleted_at;
       });
@@ -949,13 +891,13 @@ function () {
 
   AbstractListProcessor.prototype.renderPerPage = function (list) {
     if (list.length > 0) {
-      var perPageNum = this.stateManager.getState('per_page') || 0;
+      var perPageNum = this.state.per_page || 0;
       var perPage = perPageNum != 0 ? perPageNum : list.length;
-      var currentPage = this.stateManager.getState('current_page');
+      var currentPage = this.state.current_page;
       var lastPage = Math.ceil(list.length / perPage);
 
       if (currentPage > lastPage) {
-        this.stateManager.setState('current_page', lastPage);
+        this.state.current_page = lastPage;
         currentPage = lastPage;
       }
 
@@ -970,7 +912,7 @@ function () {
   };
 
   AbstractListProcessor.prototype.includeDeleted = function (list) {
-    if (!this.stateManager.getState('include_deleted')) {
+    if (!this.state.include_deleted) {
       return list.filter(function (val) {
         return !val.deleted_at;
       });
@@ -982,7 +924,7 @@ function () {
   AbstractListProcessor.prototype.sortByField = function (_a) {
     var list = _a.slice(0);
 
-    var _b = this.stateManager.getState('sort_by'),
+    var _b = this.state.sort_by,
         field = _b.field,
         direction = _b.direction;
 
@@ -998,6 +940,26 @@ function () {
         if (a[field] < b[field]) return 1;
         return 0;
       });
+    }
+
+    return list;
+  };
+
+  AbstractListProcessor.prototype.checkItemIfReallyHasChildren = function (list) {
+    var _this = this;
+
+    if (!this.state.include_deleted) {
+      var listCopy = JSON.parse(JSON.stringify(list));
+      listCopy.forEach(function (item) {
+        if (item.children_count > 0) {
+          var filteredList = _this.state.list.filter(function (el) {
+            return el.parent === item.id && el.deleted_at;
+          });
+
+          if (filteredList.length === item.children_count) item.children_count = 0;
+        }
+      });
+      return listCopy;
     }
 
     return list;
@@ -1029,9 +991,7 @@ var AbstractStateManager
 =
 /** @class */
 function () {
-  function AbstractStateManager(state) {
-    this.state = state;
-  }
+  function AbstractStateManager() {}
 
   AbstractStateManager.prototype.setState = function (stateFieldName, data) {
     this.state[stateFieldName] = data;
@@ -1200,15 +1160,11 @@ var ListController_1 = __importDefault(__webpack_require__(/*! ./ListController 
 
 var CategoriesState_1 = __webpack_require__(/*! ./CategoriesState */ "./resources/js/admin/modules/categories_module/CategoriesState.js");
 
-var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../app/api/CategoriesApi */ "./resources/js/admin/app/api/CategoriesApi.js"));
-
 var CategoriesStateManager_1 = __importDefault(__webpack_require__(/*! ./CategoriesStateManager */ "./resources/js/admin/modules/categories_module/CategoriesStateManager.js"));
 
 var ListControlsController_1 = __importDefault(__webpack_require__(/*! ./ListControlsController */ "./resources/js/admin/modules/categories_module/ListControlsController.js"));
 
 var DeleteModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/DeleteModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/DeleteModalController.js"));
-
-var ListProcessor_1 = __importDefault(__webpack_require__(/*! ./list_processor/ListProcessor */ "./resources/js/admin/modules/categories_module/list_processor/ListProcessor.js"));
 
 var CategoriesController =
 /** @class */
@@ -1241,51 +1197,13 @@ function () {
       }
     };
 
-    this.stateManager = new CategoriesStateManager_1["default"](this.state);
-    this.listProcessor = new ListProcessor_1["default"](this.stateManager);
-    this.listController = new ListController_1["default"](this.stateManager, this.listProcessor);
+    this.stateManager = new CategoriesStateManager_1["default"]();
+    this.listController = new ListController_1["default"](this.stateManager);
     this.formController = new FormController_1["default"](this.stateManager);
     this.deleteModal = new DeleteModalController_1["default"](this.stateManager);
-    /* set rerender list func from listController */
-
-    this.formController.getRenderFunc(this.listController.renderList, this.listController);
     this.listControlsController = new ListControlsController_1["default"](this.stateManager);
-    /* set rerender list func from listControlsController */
-
-    this.listControlsController.getRenderFunc(this.listController.renderList, this.listController);
-    /*set render list function*/
-
-    if (this.deleteModal.setListRenderFunction) {
-      this.deleteModal.setListRenderFunction(this.listController.renderList, this.listController);
-    }
-    /*
-    * init state with values
-    * */
-
-
-    this.fillState();
-    /*switch form and list submodules*/
-
     this.listOpenClose();
   }
-
-  CategoriesController.prototype.fillState = function () {
-    var _this = this;
-
-    var tokenElement = document.querySelector('[name=csrf-token]');
-    var formData = {
-      'X-CSRF-TOKEN': tokenElement ? tokenElement.getAttribute('content') : ''
-    };
-    var Api = new CategoriesApi_1["default"]('/admin/categories/get_list', 'POST', {
-      formData: JSON.stringify(formData)
-    });
-    var promise = Api.exeq();
-    promise.then(function (data) {
-      _this.stateManager.setState('list', data);
-
-      _this.listController.renderList();
-    });
-  };
 
   return CategoriesController;
 }();
@@ -1310,6 +1228,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.State = void 0;
 exports.State = {
   list: [],
+  indexes: {},
   current_page: 1,
   per_page: 10,
   include_deleted: 0,
@@ -1372,14 +1291,71 @@ Object.defineProperty(exports, "__esModule", {
 
 var AbstractStateManager_1 = __importDefault(__webpack_require__(/*! ../../app/state_manager/AbstractStateManager */ "./resources/js/admin/app/state_manager/AbstractStateManager.js"));
 
+var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../app/api/CategoriesApi */ "./resources/js/admin/app/api/CategoriesApi.js"));
+
+var CategoriesState_1 = __webpack_require__(/*! ./CategoriesState */ "./resources/js/admin/modules/categories_module/CategoriesState.js");
+
+var ListRender_1 = __importDefault(__webpack_require__(/*! ./ListRender */ "./resources/js/admin/modules/categories_module/ListRender.js"));
+
 var CategoriesStateManager =
 /** @class */
 function (_super) {
   __extends(CategoriesStateManager, _super);
 
   function CategoriesStateManager() {
-    return _super !== null && _super.apply(this, arguments) || this;
+    var _this = _super.call(this) || this;
+
+    _this.state = _this.setStateProxy();
+
+    _this.fillState();
+
+    return _this;
   }
+
+  CategoriesStateManager.prototype.setStateProxy = function () {
+    var _this = this;
+
+    return new Proxy(CategoriesState_1.State, {
+      set: function set(target, prop, value, receiver) {
+        target[prop] = value;
+
+        if (prop === 'list') {
+          target['indexes'] = _this.fillIndexess(target[prop]);
+        }
+
+        if (prop !== 'indexes') {
+          var listRender = new ListRender_1["default"](receiver);
+          listRender.renderList();
+        }
+
+        return true;
+      }
+    });
+  };
+
+  CategoriesStateManager.prototype.fillState = function () {
+    var _this = this;
+
+    var tokenElement = document.querySelector('[name=csrf-token]');
+    var formData = {
+      'X-CSRF-TOKEN': tokenElement ? tokenElement.getAttribute('content') : ''
+    };
+    var Api = new CategoriesApi_1["default"]('/admin/categories/get_list', 'POST', {
+      formData: JSON.stringify(formData)
+    });
+    var promise = Api.exeq();
+    promise.then(function (data) {
+      _this.state.list = data;
+    });
+  };
+
+  CategoriesStateManager.prototype.fillIndexess = function (list) {
+    var indexesIdMap = {};
+    list.forEach(function (item, key) {
+      indexesIdMap[item.id] = key;
+    });
+    return indexesIdMap;
+  };
 
   return CategoriesStateManager;
 }(AbstractStateManager_1["default"]);
@@ -1623,50 +1599,16 @@ Object.defineProperty(exports, "__esModule", {
 
 var AbstractListController_1 = __importDefault(__webpack_require__(/*! ../../app/controllers/list_controllers/AbstractListController */ "./resources/js/admin/app/controllers/list_controllers/AbstractListController.js"));
 
-var ListBuilder_1 = __importDefault(__webpack_require__(/*! ./list/html_builders/ListBuilder */ "./resources/js/admin/modules/categories_module/list/html_builders/ListBuilder.js"));
-
-var PaginationBuilder_1 = __importDefault(__webpack_require__(/*! ./list/html_builders/PaginationBuilder */ "./resources/js/admin/modules/categories_module/list/html_builders/PaginationBuilder.js"));
-
 var ListController =
 /** @class */
 function (_super) {
   __extends(ListController, _super);
 
-  function ListController(stateManager, listProcessor) {
-    var _this = _super.call(this, stateManager, listProcessor) || this;
+  function ListController(stateManager) {
+    var _this = _super.call(this, stateManager) || this;
 
     _this.listContainer = document.getElementById('categories_list_container');
-
-    _this.getListBuilder = function () {
-      return new ListBuilder_1["default"]();
-    };
-
-    _this.renderList = function () {
-      var list = _this.listProcessor.getList();
-
-      var builder = _this.getListBuilder();
-
-      var listHtml = builder.build(list);
-      var tableContainer = document.querySelector('#categories_list_container .table .table_body');
-
-      if (tableContainer) {
-        tableContainer.innerHTML = listHtml;
-      }
-
-      var paginationContainer = document.querySelector('.cat_list_nav');
-
-      var pagination = _this.getPaginationBuilder();
-
-      if (paginationContainer) {
-        paginationContainer.innerHTML = pagination.build(_this.renderPaginationButtons(list));
-      }
-
-      _this.setListItemsNumberMaxParam(list);
-    };
-
-    _this.getListBuilder();
     /*parent abstract list controllers methods */
-
 
     _this.includeDeleted();
 
@@ -1683,12 +1625,7 @@ function (_super) {
     _this.sortByField();
 
     return _this;
-    /*parent abstract list controllers methods */
   }
-
-  ListController.prototype.getPaginationBuilder = function () {
-    return new PaginationBuilder_1["default"]();
-  };
 
   return ListController;
 }(AbstractListController_1["default"]);
@@ -1733,6 +1670,20 @@ var __extends = this && this.__extends || function () {
   };
 }();
 
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -1747,13 +1698,15 @@ var AbstractListControlsController_1 = __importDefault(__webpack_require__(/*! .
 
 var CategoriesApi_1 = __importDefault(__webpack_require__(/*! ../../app/api/CategoriesApi */ "./resources/js/admin/app/api/CategoriesApi.js"));
 
-var InfoModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/InfoModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/InfoModalController.js"));
+var InfoModalController_1 = __importDefault(__webpack_require__(/*! ./modals_controllers/InfoModalController */ "./resources/js/admin/modules/categories_module/modals_controllers/InfoModalController.js")); // import {itemFindById} from "../../lib/item_find/items_find";
+// import ListBuilder from "./list/html_builders/ListBuilder";
 
-var items_find_1 = __webpack_require__(/*! ../../lib/item_find/items_find */ "./resources/js/admin/lib/item_find/items_find.js");
-
-var ListBuilder_1 = __importDefault(__webpack_require__(/*! ./list/html_builders/ListBuilder */ "./resources/js/admin/modules/categories_module/list/html_builders/ListBuilder.js"));
 
 var random_color_1 = __webpack_require__(/*! ../../lib/random_color/random_color */ "./resources/js/admin/lib/random_color/random_color.js");
+
+var ListRender_1 = __importDefault(__webpack_require__(/*! ./ListRender */ "./resources/js/admin/modules/categories_module/ListRender.js"));
+
+var CategoriesState_1 = __webpack_require__(/*! ./CategoriesState */ "./resources/js/admin/modules/categories_module/CategoriesState.js");
 
 var ListControlsController =
 /** @class */
@@ -1805,12 +1758,14 @@ function (_super) {
         var promise = Api.exeq();
         promise.then(function (res) {
           if (res === 1) {
-            var list = _this.stateManager.getState('list');
+            var list = __spreadArrays(_this.stateManager.getState('list'));
 
-            var elem = items_find_1.itemFindById(list, +id_1);
+            var indexes = _this.stateManager.getState('indexes');
+
+            var elem = list[indexes[id_1]];
             if (elem) elem.deleted_at = null;
 
-            _this.listRenderFunction();
+            _this.stateManager.setState('list', list);
           }
         });
       }
@@ -1837,20 +1792,30 @@ function (_super) {
           target.innerText = 'expand_more';
         } else {
           itemBox.classList.add('children_show');
-          var parentId = itemBox.dataset.id;
+          var parentId_1 = +itemBox.dataset.id;
 
           var list = _this.stateManager.getState('list');
 
-          var elem = items_find_1.itemFindById(list, +parentId);
-          elem.children_show = true;
-          var listBuilder = new ListBuilder_1["default"]();
-          var html = listBuilder.build(elem.children_list);
-          target.innerText = 'expand_less';
-          var boxColor = random_color_1.getRandomColor();
-          header.style.backgroundColor = boxColor;
-          header.classList.add('has_child');
-          body.innerHTML = html;
-          body.style.backgroundColor = boxColor;
+          var indexes = _this.stateManager.getState('indexes');
+
+          var elem = list[indexes[parentId_1]];
+
+          if (elem.children_count > 0) {
+            var childrenList = list.filter(function (item) {
+              return item.parent === parentId_1;
+            });
+            elem.children_show = true;
+            var listRender = new ListRender_1["default"](CategoriesState_1.State);
+            listRender.renderList(childrenList); // const listBuilder = new ListBuilder()
+            // const html = listBuilder.build(childrenList)
+
+            target.innerText = 'expand_less';
+            var boxColor = random_color_1.getRandomColor();
+            header.style.backgroundColor = boxColor;
+            header.classList.add('has_child'); // body.innerHTML = html
+
+            body.style.backgroundColor = boxColor;
+          }
         }
       }
     });
@@ -1860,6 +1825,135 @@ function (_super) {
 }(AbstractListControlsController_1["default"]);
 
 exports["default"] = ListControlsController;
+
+/***/ }),
+
+/***/ "./resources/js/admin/modules/categories_module/ListRender.js":
+/*!********************************************************************!*\
+  !*** ./resources/js/admin/modules/categories_module/ListRender.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var ListBuilder_1 = __importDefault(__webpack_require__(/*! ./list/html_builders/ListBuilder */ "./resources/js/admin/modules/categories_module/list/html_builders/ListBuilder.js"));
+
+var PaginationBuilder_1 = __importDefault(__webpack_require__(/*! ./list/html_builders/PaginationBuilder */ "./resources/js/admin/modules/categories_module/list/html_builders/PaginationBuilder.js"));
+
+var ListProcessor_1 = __importDefault(__webpack_require__(/*! ./list_processor/ListProcessor */ "./resources/js/admin/modules/categories_module/list_processor/ListProcessor.js"));
+
+var ListRender =
+/** @class */
+function () {
+  function ListRender(state) {
+    var _this = this;
+
+    this.renderList = function (list) {
+      if (list === void 0) {
+        list = [];
+      }
+
+      var listProcessor = new ListProcessor_1["default"](_this.state);
+      var resList = list.length === 0 ? listProcessor.getList() : listProcessor.getList(list);
+      var builder = new ListBuilder_1["default"]();
+      var listHtml = builder.build(resList);
+
+      if (list.length === 0) {
+        _this.renderMainList(resList, listHtml);
+      } else {
+        ListRender.renderChildList(resList, listHtml);
+      }
+    };
+
+    this.setListItemsNumberMaxParam = function (list) {
+      var perPageInput = document.getElementById('per_page');
+
+      if (perPageInput) {
+        var len = list.length;
+        perPageInput.setAttribute('max', len);
+
+        if (_this.state.per_page > len) {
+          perPageInput.value = len;
+        } else {
+          perPageInput.value = _this.state.per_page;
+        }
+      }
+    };
+
+    this.state = state;
+  }
+
+  ListRender.prototype.renderMainList = function (resList, listHtml) {
+    var tableContainer = document.querySelector('#categories_list_container .table .table_body');
+
+    if (tableContainer) {
+      tableContainer.innerHTML = listHtml;
+    }
+
+    var paginationContainer = document.querySelector('.cat_list_nav');
+    var pagination = new PaginationBuilder_1["default"]();
+
+    if (paginationContainer) {
+      paginationContainer.innerHTML = pagination.build(this.renderPaginationButtons(resList));
+    }
+
+    this.setListItemsNumberMaxParam(resList);
+  };
+
+  ListRender.renderChildList = function (resList, listHtml) {
+    if (resList.length > 0) {
+      var parentId = resList[0].parent;
+      var target = document.querySelector('.one_item[data-id="' + parentId + '"] .one_cat_body');
+      if (target) target.innerHTML = listHtml;
+    }
+  };
+
+  ListRender.prototype.renderPaginationButtons = function (list) {
+    var lastPage = Math.ceil(list.length / +this.state.per_page);
+    var objectToBuilder = {
+      start_page: 1,
+      current_page: +this.state.current_page,
+      last_page: +lastPage,
+      buttons_num: lastPage < 3 ? lastPage : 3
+    };
+
+    if (objectToBuilder.current_page == objectToBuilder.last_page) {
+      /*if last page*/
+      if (objectToBuilder.last_page > 2) {
+        objectToBuilder.start_page = objectToBuilder.current_page - 2;
+        objectToBuilder.buttons_num = objectToBuilder.last_page;
+      } else if (objectToBuilder.last_page == 2) {
+        objectToBuilder.start_page = objectToBuilder.current_page - 1;
+        objectToBuilder.buttons_num = objectToBuilder.last_page;
+      } else {
+        objectToBuilder.buttons_num = 0;
+      }
+    } else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {
+      objectToBuilder.start_page = objectToBuilder.current_page - 1;
+      objectToBuilder.buttons_num = objectToBuilder.current_page + 1;
+    } else {
+      objectToBuilder.start_page = 1;
+    }
+
+    return objectToBuilder;
+  };
+
+  return ListRender;
+}();
+
+exports["default"] = ListRender;
 
 /***/ }),
 
@@ -2049,7 +2143,7 @@ function () {
     var listHtml = '';
     listHtml += "<div class=\"one_item one_cat" + deleted + " \" data-id=\"" + item.id + "\" data-key=\"" + key + "\">" + "<div class=\"one_cat_header row align-items-center py-1 mx-0 py-lg-2 border-bottom\">" + ("<div class=\"id_field col col-1\">" + item.id + "</div>") + ("<div class=\"name_field col-3\">" + item.name + "</div>") + ("<div class=\"heading_field col-4\">" + item.heading + "</div>") + ("<div class=\"text_fields_field col-2\">" + textFieldsNum + "</div>") + "<div class=\"controls_field col-2 d-flex justify-content-end align-items-center\">" + "<span title=\"add into\" class=\"material-icons add_into_this\">add</span>";
 
-    if (item.children_list && item.children_list.length > 0) {
+    if (item.children_count && item.children_count > 0) {
       listHtml += '<span title="list view" class="material-icons view_list">expand_more</span>';
     }
 
@@ -2205,24 +2299,28 @@ var ListProcessor =
 function (_super) {
   __extends(ListProcessor, _super);
 
-  function ListProcessor(stateManager) {
-    return _super.call(this, stateManager) || this;
+  function ListProcessor() {
+    return _super !== null && _super.apply(this, arguments) || this;
   }
 
-  ListProcessor.prototype.getList = function () {
-    var list = __spreadArrays(this.stateManager.getState('list'));
+  ListProcessor.prototype.getList = function (list) {
+    if (list === void 0) {
+      list = __spreadArrays(this.state.list.filter(function (item) {
+        return item.parent === 0;
+      }));
+    }
 
     list = this.searchItems(list);
     list = this.sortByField(list);
     list = this.includeDeleted(list);
     list = this.onlyDeleted(list);
+    list = this.checkItemIfReallyHasChildren(list);
     list = this.renderPerPage(list);
     return list;
   };
 
   ListProcessor.prototype.searchItems = function (list) {
-    var searchString = this.stateManager.getState('search_string');
-    return searchString ? recursive_search_1.recursiveSearchFunction(searchString, ['heading', 'name'], list) : list;
+    return this.state.search_string !== '' ? recursive_search_1.recursiveSearchFunction(this.state.search_string, ['heading', 'name'], __spreadArrays(this.state.list)) : list;
   };
 
   return ListProcessor;
@@ -2241,6 +2339,20 @@ exports["default"] = ListProcessor;
 
 "use strict";
 
+
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -2321,14 +2433,12 @@ function () {
         var promise = Api.exeq();
         promise.then(function (res) {
           if (res.deleted_num > 0) {
-            // const list = this.stateManager.getState('list')
             res.deleted_items.forEach(function (item) {
-              var element = items_find_1.itemFindById(list, +item.id);
+              var element = items_find_1.itemFindById(__spreadArrays(list), +item.id);
               element.deleted_at = item.deleted_at;
+
+              _this.stateManager.setState('list', list);
             });
-
-            _this.listRenderFunc();
-
             var closeButton = document.querySelector('#itemDeleteModal .modal_close');
             if (closeButton) closeButton.click();
           }

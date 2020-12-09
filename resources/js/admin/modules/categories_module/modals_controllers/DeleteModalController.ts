@@ -56,12 +56,11 @@ class DeleteModalController implements ModalControllerInterface{
                 const promise: any = Api.exeq()
                 promise.then((res: any) => {
                         if (res.deleted_num > 0) {
-                            // const list = this.stateManager.getState('list')
                             res.deleted_items.forEach((item:any)=>{
-                                let element:any = itemFindById(list, +item.id)
+                                let element:any = itemFindById([...list], +item.id)
                                 element.deleted_at = item.deleted_at
+                                this.stateManager.setState('list',list)
                             })
-                            this.listRenderFunc()
                             const closeButton: any = document.querySelector('#itemDeleteModal .modal_close')
                             if(closeButton) closeButton.click()
                         }
@@ -70,7 +69,6 @@ class DeleteModalController implements ModalControllerInterface{
             })
         }
     }
-
     renderModal(modalData: any): void {
     }
 

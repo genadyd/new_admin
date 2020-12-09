@@ -20,7 +20,8 @@ class ListBuilder implements ListBuilderInterface {
             `<div class="text_fields_field col-2">${textFieldsNum}</div>` +
             `<div class="controls_field col-2 d-flex justify-content-end align-items-center">` +
             `<span title="add into" class="material-icons add_into_this">add</span>`
-        if (item.children_list && item.children_list.length > 0) {
+
+        if (item.children_count && item.children_count > 0) {
             listHtml += '<span title="list view" class="material-icons view_list">expand_more</span>'
         }
         listHtml += `<button type="button" class="info_button ml-0" data-toggle="modal" data-target="#categoryInfoModal">` +

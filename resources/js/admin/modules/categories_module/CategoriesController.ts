@@ -8,7 +8,6 @@ import ListControlsControllerInterface
     from "../../app/controllers/list_controllers/list_controls_controller/ListControlsControllerInterface";
 import ListControlsController from "./ListControlsController";
 import DeleteModalController from "./modals_controllers/DeleteModalController";
-import ListProcessor from "./list_processor/ListProcessor";
 
 
 class CategoriesController {
@@ -21,27 +20,11 @@ class CategoriesController {
     private listControlsController:ListControlsControllerInterface
 
     constructor() {
-        this.stateManager = new CategoriesStateManager(this.state)
-        this.listProcessor = new ListProcessor(this.stateManager)
-        this.listController = new ListController(this.stateManager,this.listProcessor)
+        this.stateManager = new CategoriesStateManager()
+        this.listController = new ListController(this.stateManager)
         this.formController = new FormController(this.stateManager)
         this.deleteModal = new DeleteModalController(this.stateManager)
-
-        /* set rerender list func from listController */
-        this.formController.getRenderFunc(this.listController.renderList, this.listController )
         this.listControlsController = new ListControlsController(this.stateManager)
-
-        /* set rerender list func from listControlsController */
-        this.listControlsController.getRenderFunc(this.listController.renderList, this.listController )
-        /*set render list function*/
-        if(this.deleteModal.setListRenderFunction) {
-            this.deleteModal.setListRenderFunction(this.listController.renderList, this.listController)
-        }
-/*
-* init state with values
-* */
-        this.fillState()
-        /*switch form and list submodules*/
         this.listOpenClose()
     }
 
@@ -64,18 +47,6 @@ class CategoriesController {
                 form.querySelector('input.parent_id').value = 0
             }
         }
-    }
-    private fillState() {
-        const tokenElement = document.querySelector('[name=csrf-token]')
-        const formData = {
-            'X-CSRF-TOKEN': tokenElement ? tokenElement.getAttribute('content') : ''
-        }
-        const Api = new CategoriesApi('/admin/categories/get_list', 'POST', {formData: JSON.stringify(formData)})
-        const promise: any = Api.exeq()
-        promise.then((data: any) => {
-            this.stateManager.setState('list', data)
-            this.listController.renderList()
-        })
     }
 }
 

@@ -27,21 +27,21 @@ var AbstractListProcessor_1 = __importDefault(require("../../../app/list_process
 var recursive_search_1 = require("../../../lib/list_search_recursive/recursive_search");
 var ListProcessor = /** @class */ (function (_super) {
     __extends(ListProcessor, _super);
-    function ListProcessor(stateManager) {
-        return _super.call(this, stateManager) || this;
+    function ListProcessor() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    ListProcessor.prototype.getList = function () {
-        var list = __spreadArrays(this.stateManager.getState('list'));
+    ListProcessor.prototype.getList = function (list) {
+        if (list === void 0) { list = __spreadArrays(this.state.list.filter(function (item) { return item.parent === 0; })); }
         list = this.searchItems(list);
         list = this.sortByField(list);
         list = this.includeDeleted(list);
         list = this.onlyDeleted(list);
+        list = this.checkItemIfReallyHasChildren(list);
         list = this.renderPerPage(list);
         return list;
     };
     ListProcessor.prototype.searchItems = function (list) {
-        var searchString = this.stateManager.getState('search_string');
-        return searchString ? recursive_search_1.recursiveSearchFunction(searchString, ['heading', 'name'], list) : list;
+        return this.state.search_string !== '' ? recursive_search_1.recursiveSearchFunction(this.state.search_string, ['heading', 'name'], __spreadArrays(this.state.list)) : list;
     };
     return ListProcessor;
 }(AbstractListProcessor_1.default));

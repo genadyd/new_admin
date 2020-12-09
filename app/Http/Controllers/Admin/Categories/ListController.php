@@ -55,7 +55,7 @@ class ListController extends BaseDataController
        if($restore_res === 1){
            $this->text_field_model->textFieldDeletedRestore($post_data->id);
        }
-       return json_encode($restore_res);
+       return $restore_res;
    }
 
 }

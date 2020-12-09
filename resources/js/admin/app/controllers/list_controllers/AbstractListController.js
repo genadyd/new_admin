@@ -18,24 +18,9 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var AbstractListController /*implements ListControllerInterface*/ = /** @class */ (function () {
-    function AbstractListController(stateManager, listProcessor) {
-        var _this = this;
-        this.setListItemsNumberMaxParam = function (list) {
-            var perPageInput = document.getElementById('per_page');
-            if (perPageInput) {
-                var len = list.length;
-                perPageInput.setAttribute('max', len);
-                if (_this.stateManager.getState('per_page') > len) {
-                    perPageInput.value = len;
-                }
-                else {
-                    perPageInput.value = _this.stateManager.getState('per_page');
-                }
-            }
-        };
+var AbstractListController = /** @class */ (function () {
+    function AbstractListController(stateManager) {
         this.stateManager = stateManager;
-        this.listProcessor = listProcessor;
     }
     AbstractListController.prototype.getToken = function () {
         var tokenElement = document.querySelector('[name=csrf-token]');
@@ -54,7 +39,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
                         if (onlyDeletedCheckBox)
                             onlyDeletedCheckBox.checked = false;
                     }
-                    _this.renderList();
+                    // this.renderList()
                 });
             }
         }
@@ -79,7 +64,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
                             if (includeDeletedCheckBox)
                                 includeDeletedCheckBox.checked = false;
                         }
-                        _this.renderList();
+                        // this.renderList()
                     }
                 });
             }
@@ -101,7 +86,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
                 }
             }
             _this.stateManager.setState('sort_by', newSortBy);
-            _this.renderList();
+            // this.renderList()
         };
         if (this.listContainer) {
             var sortButtons = document.querySelectorAll('.sort_icon[data-sort]');
@@ -119,7 +104,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
             if (sortByDateInput) {
                 sortByDateInput.addEventListener('click', function () {
                     _this.stateManager.setState('sort_by_date_desc', !_this.stateManager.getState('sort_by_date_desc'));
-                    _this.renderList();
+                    // this.renderList()
                 });
             }
         }
@@ -130,7 +115,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
         if (perPageInput) {
             perPageInput.oninput = function (e) {
                 _this.stateManager.setState('per_page', +e.target.value);
-                _this.renderList();
+                // this.renderList()
             };
         }
     };
@@ -146,39 +131,9 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
                 else {
                     _this.stateManager.setState('search_string', '');
                 }
-                _this.renderList();
+                // this.renderList()
             };
         }
-    };
-    AbstractListController.prototype.renderPaginationButtons = function (list) {
-        var lastPage = Math.ceil(list.length / +this.stateManager.getState('per_page'));
-        var objectToBuilder = {
-            start_page: 1,
-            current_page: +this.stateManager.getState('current_page'),
-            last_page: +lastPage,
-            buttons_num: lastPage < 3 ? lastPage : 3
-        };
-        if (objectToBuilder.current_page == objectToBuilder.last_page) { /*if last page*/
-            if (objectToBuilder.last_page > 2) {
-                objectToBuilder.start_page = objectToBuilder.current_page - 2;
-                objectToBuilder.buttons_num = objectToBuilder.last_page;
-            }
-            else if (objectToBuilder.last_page == 2) {
-                objectToBuilder.start_page = objectToBuilder.current_page - 1;
-                objectToBuilder.buttons_num = objectToBuilder.last_page;
-            }
-            else {
-                objectToBuilder.buttons_num = 0;
-            }
-        }
-        else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {
-            objectToBuilder.start_page = objectToBuilder.current_page - 1;
-            objectToBuilder.buttons_num = objectToBuilder.current_page + 1;
-        }
-        else {
-            objectToBuilder.start_page = 1;
-        }
-        return objectToBuilder;
     };
     AbstractListController.prototype.pageSwitch = function () {
         var _this = this;
@@ -193,7 +148,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
                         try {
                             var pageNum = target.getAttribute('page_num');
                             _this.stateManager.setState('current_page', pageNum);
-                            _this.renderList();
+                            // this.renderList()
                         }
                         catch (error) {
                             console.error('Expected attribute "page_num" in target Button');
@@ -211,7 +166,7 @@ var AbstractListController /*implements ListControllerInterface*/ = /** @class *
         // items.push(newItemObject)
         var lastPage = Math.ceil(items.length / +this.stateManager.getState('per_page'));
         this.stateManager.setState('current_page', lastPage);
-        this.renderList();
+        // this.renderList()
     };
     return AbstractListController;
 }());
