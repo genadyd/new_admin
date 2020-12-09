@@ -1157,63 +1157,9 @@ exports.itemsFindTree = function (firstElement, resElementsArray) {
   !*** ./resources/js/admin/lib/list_search_recursive/recursive_search.js ***!
   \**************************************************************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-
-var __spreadArrays = this && this.__spreadArrays || function () {
-  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
-    s += arguments[i].length;
-  }
-
-  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
-    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
-      r[k] = a[j];
-    }
-  }
-
-  return r;
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.recursiveSearchFunction = void 0;
-/*
-* recursive search func
-* @ params :
-*   1. searchString:string
-*   2. fieldsNamesList:string[] - search targets field names
-*   3. list:array - search list
-* @return : new list of funded elements or false
-*
-* */
-
-exports.recursiveSearchFunction = function (searchString, fieldsNamesList, list) {
-  var listRes = [];
-  list = JSON.parse(JSON.stringify(list));
-  /*deep list copy*/
-
-  var pattern = new RegExp(searchString, "g");
-  list.forEach(function (item) {
-    var foundField = fieldsNamesList.filter(function (field) {
-      return pattern.test(item[field]);
-    });
-
-    if (foundField.length > 0) {
-      foundField.forEach(function (f) {
-        item[f] = item[f].replace(pattern, "<span class=\"finded\">" + searchString + "</span>");
-      });
-      listRes.push(item);
-    }
-
-    if (item.children_list && item.children_list.length > 0) {
-      listRes = __spreadArrays(listRes, exports.recursiveSearchFunction(searchString, fieldsNamesList, __spreadArrays(item.children_list)));
-    }
-  });
-  return listRes;
-};
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nError: ENOENT: no such file or directory, open '/var/www/html/new_admin/resources/js/admin/lib/list_search_recursive/recursive_search.js'");
 
 /***/ }),
 
@@ -1222,32 +1168,9 @@ exports.recursiveSearchFunction = function (searchString, fieldsNamesList, list)
   !*** ./resources/js/admin/lib/random_color/random_color.js ***!
   \*************************************************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getRandomColor = void 0;
-
-function getRandomColor(opacity) {
-  if (opacity === void 0) {
-    opacity = '33';
-  }
-
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-
-  return color + opacity;
-}
-
-exports.getRandomColor = getRandomColor;
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nError: ENOENT: no such file or directory, open '/var/www/html/new_admin/resources/js/admin/lib/random_color/random_color.js'");
 
 /***/ }),
 
