@@ -1,85 +1,44 @@
+import ShipListFilters from "../../app/Ship/Components/List/ShipListFilters";
 import ListBuilder from "./list/html_builders/ListBuilder";
 import PaginationBuilder from "./list/html_builders/PaginationBuilder";
-import ListProcessor from "./list_processor/ListProcessor";
+import ShipListSearch from "../../app/Ship/Components/List/ShipListSearch";
 
-class ListRender{
-    private readonly state:any
-    constructor(state:any) {
-        this.state = state
-    }
-    public  renderList =(list:any[] = [] )=> {
-        const listProcessor = new ListProcessor(this.state)
-        const resList = list.length ===0 ? listProcessor.getList(): listProcessor.getList(list)
-        const builder = new ListBuilder()
-        const listHtml: string = builder.build(resList)
-        if(list.length ===0){
-            this.renderMainList(resList,listHtml )
-        } else{
-            ListRender.renderChildList(resList,listHtml)
-        }
 
-    }
-    private renderMainList(resList:any[],listHtml:string){
-        const tableContainer = document.querySelector('#categories_list_container .table .table_body')
-        if (tableContainer) {
-            tableContainer.innerHTML = listHtml
+class ListRender implements ShipListRendersInterface{
+    public  render(state: any) {
+        const filteredList = ListRender.listFilter(state)
+        const listHtml = ListRender.htmlBuilder(filteredList)
+        const lastPage = Math.ceil(filteredList.length / state.per_page)
+        let currentPage = state.current_page
+        if (currentPage > lastPage) {
+            state.current_page = lastPage
         }
-        const paginationContainer = document.querySelector('.cat_list_nav')
-        const pagination = new PaginationBuilder()
-
-        if (paginationContainer) {
-            paginationContainer.innerHTML = pagination.build(this.renderPaginationButtons(resList))
-        }
-        this.setListItemsNumberMaxParam(resList)
-    }
-    private static renderChildList(resList:any[],listHtml:string){
-        if(resList.length >0) {
-            const parentId = resList[0].parent
-            const target = document.querySelector('.one_item[data-id="' + parentId + '"] .one_cat_body')
-            if (target) target.innerHTML = listHtml
-        }
-
+        const tableBody = document.querySelector('#categories_list_container .table_container .table_body')
+        if (tableBody) tableBody.innerHTML = listHtml
+        const paginatorContainer = document.querySelector('#categories_list_container .pagination')
+        if(paginatorContainer) paginatorContainer.innerHTML = ListRender.paginationBuilder(state)
     }
 
-    protected renderPaginationButtons(list: any) {
-        const lastPage = Math.ceil(list.length / +this.state.per_page)
-        const objectToBuilder = {
-            start_page: 1,
-            current_page: +this.state.current_page,
-            last_page: +lastPage,
-            buttons_num: lastPage < 3 ? lastPage : 3
-        }
-        if (objectToBuilder.current_page == objectToBuilder.last_page) { /*if last page*/
-            if (objectToBuilder.last_page > 2) {
-                objectToBuilder.start_page = objectToBuilder.current_page - 2
-                objectToBuilder.buttons_num = objectToBuilder.last_page
-            } else if (objectToBuilder.last_page == 2) {
-                objectToBuilder.start_page = objectToBuilder.current_page - 1
-                objectToBuilder.buttons_num = objectToBuilder.last_page
-            } else {
-                objectToBuilder.buttons_num = 0
-            }
-        } else if (objectToBuilder.current_page > 1 && objectToBuilder.current_page < objectToBuilder.last_page) {
-            objectToBuilder.start_page = objectToBuilder.current_page - 1
-            objectToBuilder.buttons_num = objectToBuilder.current_page + 1
-        } else {
-            objectToBuilder.start_page = 1
-        }
-
-        return objectToBuilder
+    private static listFilter(state: any) {
+        const listFilters = new ShipListFilters()
+        let list = [...state.list.filter((item: any) => item.parent === state.parent_id)]
+        list = ShipListSearch.search( list, state.search_string,['heading', 'name'])
+        list = listFilters.sortByField(list, state.sort_by)
+        list = listFilters.includeDeleted(list, state.include_deleted)
+        list = listFilters.onlyDeleted([...list], state.only_deleted)
+        list = listFilters.renderPerPage(list, state.per_page, state.current_page)
+        return list
     }
 
-    protected setListItemsNumberMaxParam = (list: any[]) => {
-        const perPageInput: any = document.getElementById('per_page')
-        if (perPageInput) {
-            let len:any = list.length
-            perPageInput.setAttribute('max', len)
-            if (this.state.per_page > len) {
-                perPageInput.value = len
-            } else {
-                perPageInput.value = this.state.per_page
-            }
-        }
+    private static  htmlBuilder(filteredList: any) {
+        const htmlBuilder = new ListBuilder()
+        return htmlBuilder.build(filteredList)
     }
+    private static  paginationBuilder(state:any){
+        const paginatingBuilder = new PaginationBuilder()
+       return  paginatingBuilder.build(state)
+    }
+
 }
+
 export default ListRender

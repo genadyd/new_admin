@@ -1,6 +1,7 @@
  export const State: any = {
         list: [],
         indexes:{},
+        parent_id:0,
         current_page: 1,
         per_page: 10,
         include_deleted: 0,
