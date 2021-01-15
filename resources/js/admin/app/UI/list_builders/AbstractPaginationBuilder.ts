@@ -1,6 +1,6 @@
 abstract class AbstractPaginationBuilder implements PaginationBuilderInterface{
     build(data: any): string {
-        if(data.buttons_num !==0) {
+        if(data.buttons_num >0) {
             let navHtml = '<ul class="pagination">' +
                 '<li class="page-item">' +
                 '<a class="page-link" page_num="1" href="#" aria-label="Previous">' +
@@ -8,7 +8,8 @@ abstract class AbstractPaginationBuilder implements PaginationBuilderInterface{
                 '</a>' +
                 '</li>'
             //===============================
-            for (let i = data.start_page; i <= data.buttons_num; i++) {
+
+            for ( let i = data.start_page; i <= data.end_page;i++) {
                 let current = data.current_page == i ? 'current' : ''
                 navHtml += '<li class="page-item ' + current + '">' +
                     '<a class="page-link" page_num="' + i + '" href="#">' + i + '</a></li>'

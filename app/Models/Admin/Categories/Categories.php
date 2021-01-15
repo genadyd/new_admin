@@ -46,17 +46,17 @@ class Categories extends Model
     public function getCategoryByid(int $cat_id):array
     {
         return DB::select(DB::raw("SELECT *,
-              (SELECT count(id) FROM categories_texts WHERE category_id = categories.id GROUP BY category_id ) AS text_field_num FROM
+              (SELECT count(id) FROM categories_texts WHERE category_id = categories.id GROUP BY category_id ) AS text_fields FROM
               categories WHERE id={$cat_id}"));
     }
 
-    public function categoryDelete(array $ids): array
+    public function categoryDelete(array $ids): int
     {
         $now = Carbon::now();
-        return array(
-            'deleted_num'=> DB::table('categories')->whereIn('id', $ids)->update(array('deleted_at' => $now)),
-            'deleted_items'=>DB::table('categories')->whereIn('id',$ids)->get(['id','deleted_at'])
-        );
+        if(DB::table('categories')->whereIn('id', $ids)->update(array('deleted_at' => $now))){
+            return 1;
+        }
+        return 0;
 
     }
 

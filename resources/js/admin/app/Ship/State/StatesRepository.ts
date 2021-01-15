@@ -1,5 +1,10 @@
 class StatesRepository{
-    private static REPOSITORY :any = {}
+    private static REPOSITORY :any
+    constructor() {
+        if(!StatesRepository.REPOSITORY){
+            StatesRepository.REPOSITORY = {}
+        }
+    }
 
     public getRepContainer(stateName:string):any|boolean {
         let resState: any = {}
@@ -36,7 +41,7 @@ class StatesRepository{
 
         }
     }
-    public setStateElement(repContainerName:string,stateElementName:string, value:any, callbackFunc?:any){
+    public setStateElement(repContainerName:string|any,stateElementName:string, value:any, callbackFunc?:any){
         if(callbackFunc && typeof callbackFunc == 'function'){
             StatesRepository.REPOSITORY[repContainerName].setCallback = {
                 ...StatesRepository.REPOSITORY[repContainerName].setCallback,
@@ -50,7 +55,7 @@ class StatesRepository{
         }
         StatesRepository.REPOSITORY[repContainerName][stateElementName] = value
     }
-    public getStateElement(repContainerName:string,stateElementName:string, callbackFunc?:any){
+    public getStateElement(repContainerName:any,stateElementName:string, callbackFunc?:any){
         return StatesRepository.REPOSITORY[repContainerName][stateElementName]
     }
 

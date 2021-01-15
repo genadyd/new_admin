@@ -12,7 +12,7 @@ class CategoriesController extends BaseController
     }
 
     protected function setJsModule(){
-        $this->js = '/js/admin/modules/categories_module/index.js';
+        $this->js = '/js/admin/modules/Categories/index.js';
     }
 
     public function show(){

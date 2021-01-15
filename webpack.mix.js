@@ -14,8 +14,7 @@ const mix = require('laravel-mix');
 // mix.js('resources/js/app.js', 'public/js')
 // mix.js('resources/js/admin/app.js', 'public/js/admin/app.js')
 // mix.js('resources/js/admin/ckeditor.js', 'public/js/admin/ckeditor.js')
-mix.js('resources/js/admin/modules/categories_module/index.js', 'public/js/admin/modules/categories_module/index.js')
-// mix.js('resources/js/admin/modules/categories_module/form', 'public/js/admin/modules/categories_module/form')
+mix.js('resources/js/admin/modules/Categories/index.js', 'public/js/admin/modules/Categories/index.js')
 
     .sass('resources/sass/admin/app.scss', 'public/css/admin/app.css', {
         implementation: require('node-sass')

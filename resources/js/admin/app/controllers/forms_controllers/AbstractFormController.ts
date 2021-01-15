@@ -8,10 +8,9 @@ abstract class AbstractFormController implements FormControllersInterface{
     protected formContainer: any
     protected renderFunc:any
     protected stateManager:any
-    protected constructor(stateManager:any) {
+    protected constructor(protected stateRepo:any) {
         this.formContainer = document.querySelector('.form_container')
         this.form = document.querySelector('.entity_form')
-        this.stateManager = stateManager
         this.validator = this.getValidator()
         this.textFieldObject = this.getTextFieldObject()
         // this.renderFunc = renderFunc

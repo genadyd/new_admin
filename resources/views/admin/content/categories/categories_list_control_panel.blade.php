@@ -10,7 +10,7 @@
             <small>Only Deleted</small></label>
     </div>
     <div class="col-3 justify-content-start align-items-center d-none d-lg-flex">
-        <input type="number" min="0" class="form-control h-25  mr-2" id="per_page" value="Mark" required>
+        <input type="number" min="1" class="form-control h-25  mr-2" id="per_page"  required>
         <label  for="per_page" class="m-0">
             <small>Items Per Page</small>
         </label>

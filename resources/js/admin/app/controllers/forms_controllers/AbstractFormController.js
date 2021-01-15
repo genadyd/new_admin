@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const FormFieldsValidator_1 = __importDefault(require("../../../lib/form_validator/FormFieldsValidator"));
 class AbstractFormController {
-    constructor(stateManager) {
+    constructor(stateRepo) {
+        this.stateRepo = stateRepo;
         this.addTextField = () => {
             const button = document.getElementById('add_text_field');
             if (button) {
@@ -87,7 +88,6 @@ class AbstractFormController {
         };
         this.formContainer = document.querySelector('.form_container');
         this.form = document.querySelector('.entity_form');
-        this.stateManager = stateManager;
         this.validator = this.getValidator();
         this.textFieldObject = this.getTextFieldObject();
         // this.renderFunc = renderFunc

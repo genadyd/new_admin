@@ -18,8 +18,22 @@ export const itemsFindTree = (firstElement:any, resElementsArray:any[]=[])=>{
             return itemsFindTree(item, resElementsArray)
         })
     }
+    return resElementsArray
+}
+export const findChildrenIdsList = (parentId:number, list:any[],idsResArray:any=[])=>{
+    let ar:number[] = []
 
-        return resElementsArray
+    idsResArray.push(+parentId)
+        list.forEach((val)=>{
+            if(val.parent === parentId) ar.push(val.id)
+        })
+    if(ar.length === 0){
+        return idsResArray
+    }else{
+        ar.forEach((v:number)=>{
+            idsResArray = findChildrenIdsList(v,list,idsResArray)
 
-
+        })
+    }
+    return idsResArray
 }

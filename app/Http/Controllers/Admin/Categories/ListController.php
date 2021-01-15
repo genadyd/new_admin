@@ -40,10 +40,10 @@ class ListController extends BaseDataController
 
    public function categoryDelete(Request $request){
        $post_data = json_decode($request->input('formData'));
+
        $delete_res = $this->model->categoryDelete($post_data->ids);
-       /*'deleted_num'
-'deleted_items'*/
-       if($delete_res['deleted_num']>0){
+
+       if($delete_res > 0){
            $this->text_field_model->textFieldDeleteByCatId($post_data->ids);
        }
 

@@ -1,7 +1,32 @@
+/*
+* class for build module state container
+* and add it into states repository
+* Methods:
+*  private @create
+*  private @stateProxy
+*
+*
+* */
+import StatesRepository from "./StatesRepository";
+
 class StateCreator {
-    public create(stateObject: any) {
-        const obj = {
-            ...stateObject,
+    private readonly poxedObject;
+    private repo:any = new StatesRepository()
+    constructor(private stateObject:any, private stateContainerName:string) {
+        this.poxedObject = this.stateProxy()
+        this.createMainState()
+    }
+
+    /*
+    * private method for build module state init object.
+    * use @stateProxy method
+    * @stateObject:object - basic state object for init state
+    *
+    * @return:object
+    * */
+    private addCallbackFunction() {
+        return {
+            ...this.stateObject,
             getCallback: {
                 callback: false,
                 defaultCallback: () => {
@@ -17,10 +42,15 @@ class StateCreator {
                 params: []
             }
         }
-        return this.stateProxy(obj)
     }
-
-    stateProxy(obj: any): any {
+    /*
+    * proxying module state object
+    * @obj:object
+    * @return:ProxyObject
+    *
+    * */
+    private stateProxy(): ProxyConstructor {
+        const obj:any = this.addCallbackFunction()
         return new Proxy(obj, {
             get: (target, key) => {
                 if (key != 'getCallback') {
@@ -45,12 +75,17 @@ class StateCreator {
                         target.setCallback.defaultCallback(target)
                     }
                 }
-
-
                 return true
             }
         })
     }
+    /*
+* private method set proxy object into repository
+* and add it into StatesRepository
+*  @return:void
+* */
+    private createMainState(){
+        this.repo.setRepContainer(this.stateContainerName, this.poxedObject)
+    }
 }
-
 export default StateCreator
