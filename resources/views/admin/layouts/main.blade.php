@@ -28,7 +28,7 @@
        <div id="page_container" class="d-flex justify-content-md-between justify-content-center">
            @include('admin.layouts.side_panel')
 
-           <div id="content_container" class=" flex-fill px-4 py-2 mx-2 mx-lg-4 my-2 my-lg-4">
+           <div id="content_container" class=" flex-fill px-lg-4 px-1 py-2 mx-2 mx-lg-4 my-2 my-lg-4">
              @yield('content')
            </div>
        </div>

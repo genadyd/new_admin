@@ -13,12 +13,12 @@ class ListBuilder implements ListBuilderInterface {
         let textFieldsNum = item.text_fields?item.text_fields.length:0
         let listHtml = ''
         listHtml += `<div class="one_item one_cat${deleted} " data-id="${item.id}" data-key="${key}">` +
-            `<div class="one_cat_header row align-items-center py-1 mx-0 py-lg-2 border-bottom">` +
-            `<div class="id_field col col-1">${item.id}</div>` +
-            `<div class="name_field col-3">${item.name}</div>` +
-            `<div class="heading_field col-4">${item.heading}</div>` +
-            `<div class="text_fields_field col-2">${textFieldsNum}</div>` +
-            `<div class="controls_field col-2 d-flex justify-content-end align-items-center">` +
+            `<div class="one_cat_header row align-items-center py-1 mx-0 py-lg-2 border-bottom justify-content-between">` +
+            `<div class="id_field col-1">${item.id}</div>` +
+            `<div class="name_field col-5 col-lg-2">${item.name}</div>` +
+            `<div class="heading_field col-2  d-none d-lg-block">${item.heading}</div>` +
+            `<div class="text_fields_field col-2 d-none d-lg-table-cell">${textFieldsNum}</div>` +
+            `<div class="controls_field col-6 col-lg-2  d-flex px-0 justify-content-end align-items-center">` +
             `<span title="add into" class="material-icons add_into_this">add</span>`
 
         if (item.children_count && item.children_count > 0) {

@@ -29,7 +29,7 @@
 {{--
   back element for sidebat open
 --}}
-<div id="side_bar_back" class="d-none d-lg-flex">
+<div id="side_bar_back" class="d-none d-xl-flex">
     <div class="main_menu_back show"></div>
     <div class="sub_menu_back @if(Request::getPathInfo()!='/admin') show @endif"></div>
 </div>

@@ -19,6 +19,7 @@ class CreateCategoriesTable extends Migration
             $table->string('name')->unique();
             $table->string('url')->default('/');
             $table->string('title');
+            $table->string('heading', 100)->nullable()->default(null);
             $table->text('description');
             $table->integer('cat_order')->default(0);
             $table->dateTime('deleted_at')->nullable(true);

@@ -82,7 +82,7 @@ class AbstractListControlPanelEventsController {
         }
     }
     searchItems() {
-        const searchInput = document.getElementById('items_search_input');
+        const searchInput = window.innerWidth > 992 ? document.getElementById('items_search_input') : document.getElementById('items_search_input_mob');
         if (searchInput) {
             searchInput.oninput = (e) => {
                 let value = e.target.value;

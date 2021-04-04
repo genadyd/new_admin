@@ -18,6 +18,7 @@ class CategoriesText extends Model
             'title'=> $field->category_text_field_title,
             'description'=> $field->text_field_description,
             'text'=> $field->ckeditor_text,
+            'created_at'=>date('Y-m-d h:i:s')
             ];
             $data_array[]=$arr;
         }
